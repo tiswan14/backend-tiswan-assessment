@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
-import prisma from './config/prisma.js'
+import authRoutes from './routes/auth.routes.js'
+import { errorHandler } from './middlewares/error.handler.js'
 
 dotenv.config()
 
@@ -8,8 +9,14 @@ const app = express()
 
 app.use(express.json())
 
+app.use('/api/auth', authRoutes)
+
 app.get('/', (req, res) => {
-    res.json({ message: 'Hello World from Express!' })
+    res.json({
+        message: '🚀 Welcome to Task Management API',
+    })
 })
+
+app.use(errorHandler)
 
 export default app
