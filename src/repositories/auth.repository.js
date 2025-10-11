@@ -1,12 +1,10 @@
 import { PrismaClient, Role } from '@prisma/client'
-import { hashPassword } from '../utils/hash.js'
 
 const prisma = new PrismaClient()
 
-export async function createUser({ name, email, password, role = Role.USER }) {
-    const hashedPassword = await hashPassword(password)
+export async function createUser({ name, email, password, role }) {
     return await prisma.user.create({
-        data: { name, email, password: hashedPassword, role },
+        data: { name, email, password, role },
     })
 }
 

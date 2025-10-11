@@ -1,5 +1,7 @@
-import { createUser, findUserByEmail } from '../services/user.service.js'
+// File: src/controllers/auth.controller.js
+
 import { signupSchema } from '../validators/auth.validator.js'
+import { authService } from '../services/auth.service.js'
 
 export async function signup(req, res, next) {
     try {
@@ -11,7 +13,6 @@ export async function signup(req, res, next) {
             const errors = {}
             error.details.forEach((detail) => {
                 const key = detail.path[0]
-                // Hapus tanda kutip di sekitar field
                 const cleanMessage = detail.message.replace(/["]/g, '')
                 errors[key] = cleanMessage
             })
@@ -24,16 +25,21 @@ export async function signup(req, res, next) {
 
         const { name, email, password, role } = value
 
-        const existingUser = await findUserByEmail(email)
-        if (existingUser)
-            return res.status(400).json({ message: 'Email already in use' })
+        const newUser = await authService.registerUser({
+            name,
+            email,
+            password,
+            role,
+        })
 
-        const user = await createUser({ name, email, password, role })
         res.status(201).json({
-            message: 'User created',
-            user: { id: user.id, email: user.email, role: user.role },
+            message: 'User created successfully',
+            user: { id: newUser.id, email: newUser.email, role: newUser.role },
         })
     } catch (error) {
+        if (error.message.includes('already in use')) {
+            return res.status(409).json({ message: error.message })
+        }
         next(error)
     }
 }
