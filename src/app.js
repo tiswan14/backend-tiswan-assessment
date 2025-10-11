@@ -1,6 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv'
-import authRoutes from './routes/auth.routes.js'
+import authRoutes from './routes/auth.route.js'
 import { errorHandler } from './middlewares/error.handler.js'
 
 dotenv.config()
