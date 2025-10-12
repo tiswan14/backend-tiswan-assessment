@@ -1,6 +1,4 @@
-import { PrismaClient, Role } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '../config/prisma.js'
 
 export async function createUser({ name, email, password, role }) {
     return await prisma.user.create({

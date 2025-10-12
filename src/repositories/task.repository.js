@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '../config/prisma.js'
 
 export async function createTask(taskData) {
     return await prisma.task.create({
@@ -9,13 +7,48 @@ export async function createTask(taskData) {
 }
 
 export async function getAllTasks() {
-    return await prisma.task.findMany()
+    return await prisma.task.findMany({
+        include: {
+            created_by: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                },
+            },
+            assigned_to: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                },
+            },
+            attachments: true,
+        },
+    })
 }
 
 export async function getTaskById(taskId) {
     return await prisma.task.findUnique({
-        where: {
-            id: taskId,
+        where: { id: taskId },
+        include: {
+            created_by: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                },
+            },
+            assigned_to: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                },
+            },
+            attachments: true,
         },
     })
 }

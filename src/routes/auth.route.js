@@ -8,7 +8,7 @@ const router = express.Router()
 router.post('/register', rateLimiter, register)
 
 //Endpoint for user login
-router.post('/login', login)
+router.post('/login', rateLimiter, login)
 
 router.post('/refresh-token', refresh)
 

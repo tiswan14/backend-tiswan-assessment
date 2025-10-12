@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 
 export function generateAccessToken(payload) {
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' })
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' })
 }
 
 export function generateRefreshToken() {

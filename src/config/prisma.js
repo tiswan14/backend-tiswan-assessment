@@ -5,7 +5,6 @@ const prisma = new PrismaClient({
     log: ['query', 'error', 'warn'],
 })
 
-// Test koneksi database saat startup
 async function testConnection() {
     try {
         await prisma.$queryRaw`SELECT 1`
@@ -18,6 +17,8 @@ async function testConnection() {
     }
 }
 
-testConnection()
+if (process.env.NODE_ENV !== 'test') {
+    testConnection()
+}
 
-export default prisma
+export { prisma }
