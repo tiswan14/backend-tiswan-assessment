@@ -42,9 +42,28 @@ export async function createTask(taskData, creatorId) {
 }
 
 // ✅ GET ALL TASKS
-export async function getAllTasks() {
-    const tasks = await getAllTasksRepository()
-    return tasks
+export async function getAllTasks(filters) {
+    try {
+        if (
+            filters.status &&
+            !Object.values(TaskStatus).includes(filters.status)
+        ) {
+            throw new Error('Invalid status filter.')
+        }
+
+        if (
+            filters.priority &&
+            !Object.values(TaskPriority).includes(filters.priority)
+        ) {
+            throw new Error('Invalid priority filter.')
+        }
+
+        const tasks = await getAllTasksRepository(filters)
+
+        return tasks
+    } catch (error) {
+        throw error
+    }
 }
 
 // ✅ GET TASK BY ID

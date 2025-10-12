@@ -6,8 +6,42 @@ export async function createTask(taskData) {
     })
 }
 
-export async function getAllTasks() {
+export async function getAllTasks(filters) {
+    const { limit, page, ...restOfFilters } = filters
+
+    const parsedLimit = parseInt(limit) || 10
+    const parsedPage = parseInt(page) || 1
+    const skip = (parsedPage - 1) * parsedLimit
+
+    const where = {}
+
+    if (restOfFilters.status) {
+        where.status = restOfFilters.status
+    }
+    if (restOfFilters.priority) {
+        where.priority = restOfFilters.priority
+    }
+    if (restOfFilters.assigned_to_id) {
+        where.assigned_to_id = restOfFilters.assigned_to_id
+    }
+    if (restOfFilters.created_by_id) {
+        where.created_by_id = restOfFilters.created_by_id
+    }
+    if (restOfFilters.due_date_before) {
+        where.due_date = {
+            lt: new Date(restOfFilters.due_date_before),
+        }
+    }
+    if (restOfFilters.due_date_after) {
+        where.due_date = {
+            gt: new Date(restOfFilters.due_date_after),
+        }
+    }
+
     return await prisma.task.findMany({
+        where: where,
+        take: parsedLimit,
+        skip: skip,
         include: {
             created_by: {
                 select: {

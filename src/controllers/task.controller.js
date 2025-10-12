@@ -45,7 +45,9 @@ export async function createTask(req, res, next) {
 // ✅ GET ALL TASKS
 export async function getAllTasks(req, res, next) {
     try {
-        const tasks = await getAllTasksService()
+        const { limit, page, ...filters } = req.query
+
+        const tasks = await getAllTasksService({ limit, page, ...filters })
         return res.status(200).json({
             success: true,
             message: 'Tasks retrieved successfully',
