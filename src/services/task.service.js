@@ -1,7 +1,10 @@
+// File: src/services/task.service.js
+
 import {
     createTask as createTaskRepository,
     getAllTasks as getAllTasksRepository,
     getTaskById as getTaskByIdRepository,
+    updateTask as updateTaskRepository,
 } from '../repositories/task.repository.js'
 import { findUserById } from '../repositories/user.repository.js'
 import { TaskStatus, TaskPriority } from '@prisma/client'
@@ -50,4 +53,20 @@ export async function getTaskById(taskId) {
         throw new Error('Task not found.')
     }
     return task
+}
+
+// ✅ UPDATE TASK
+export async function updateTask(taskId, taskData, userId, userRole) {
+    const taskToUpdate = await getTaskByIdRepository(taskId)
+
+    if (!taskToUpdate) {
+        throw new Error('Task not found.')
+    }
+
+    // Authorization logic: Only the task creator or an ADMIN can update
+    if (taskToUpdate.created_by_id !== userId && userRole !== 'ADMIN') {
+        throw new Error('Unauthorized to update this task.')
+    }
+
+    return await updateTaskRepository(taskId, taskData)
 }

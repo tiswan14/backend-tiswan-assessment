@@ -2,8 +2,12 @@ import {
     getAllTasks as getAllTasksService,
     getTaskById as getTaskByIdService,
     createTask as createTaskService,
+    updateTask as updateTaskService,
 } from '../services/task.service.js'
-import { taskCreateSchema } from '../validators/task.validator.js'
+import {
+    taskCreateSchema,
+    taskUpdateSchema,
+} from '../validators/task.validator.js'
 
 // ✅ CREATE TASK
 export async function createTask(req, res, next) {
@@ -17,7 +21,7 @@ export async function createTask(req, res, next) {
                 .json({ success: false, message: errorMessage })
         }
 
-        const creatorId = req.user?.userId // aman kalau req.user undefined
+        const creatorId = req.user?.userId
 
         const newTask = await createTaskService(value, creatorId)
 
@@ -76,6 +80,43 @@ export async function getTaskById(req, res, next) {
                 success: false,
                 message: error.message,
             })
+        }
+        next(error)
+    }
+}
+
+export async function updateTask(req, res, next) {
+    try {
+        const { error, value } = taskUpdateSchema.validate(req.body)
+
+        if (error) {
+            const errorMessage = error.details[0].message.replace(/"/g, '')
+            return res
+                .status(400)
+                .json({ success: false, message: errorMessage })
+        }
+
+        const { id } = req.params
+        const userId = req.user.userId
+        const userRole = req.user.role
+
+        const updatedTask = await updateTaskService(id, value, userId, userRole)
+
+        res.status(200).json({
+            success: true,
+            message: 'Task updated successfully',
+            data: updatedTask,
+        })
+    } catch (error) {
+        if (error.message.includes('not found')) {
+            return res
+                .status(404)
+                .json({ success: false, message: error.message })
+        }
+        if (error.message.includes('Unauthorized')) {
+            return res
+                .status(403)
+                .json({ success: false, message: error.message })
         }
         next(error)
     }
