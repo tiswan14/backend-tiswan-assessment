@@ -1,5 +1,3 @@
-// File: src/services/task.service.js
-
 import {
     createTask as createTaskRepository,
     getAllTasks as getAllTasksRepository,
@@ -8,6 +6,11 @@ import {
     deleteTask as deleteTaskRepository,
 } from '../repositories/task.repository.js'
 import { findUserById } from '../repositories/user.repository.js'
+import {
+    BadRequestError,
+    NotFoundError,
+    ForbiddenError,
+} from '../errors/constum.error.js'
 import { TaskStatus, TaskPriority } from '@prisma/client'
 
 // ✅ CREATE TASK
@@ -17,25 +20,25 @@ export async function createTask(taskData, creatorId) {
 
     const creator = await findUserById(creatorId)
     if (!creator) {
-        throw new Error('Creator not found.')
+        throw new NotFoundError('Creator not found.')
     }
 
     if (assigned_to_id) {
         const assignee = await findUserById(assigned_to_id)
 
         if (assigned_to_id === creatorId) {
-            throw new Error('You cannot assign a task to yourself.')
+            throw new BadRequestError('You cannot assign a task to yourself.')
         }
         if (!assignee) {
-            throw new Error('Assignee not found.')
+            throw new NotFoundError('Assignee not found.')
         }
 
         if (assignee.role === 'ADMIN') {
-            throw new Error('You cannot assign a task to an Admin.')
+            throw new ForbiddenError('You cannot assign a task to an Admin.')
         }
 
         if (creator.role === 'MANAGER' && assignee.role === 'ADMIN') {
-            throw new Error('Manager cannot assign tasks to an Admin.')
+            throw new ForbiddenError('Manager cannot assign tasks to an Admin.')
         }
     }
 
@@ -60,18 +63,17 @@ export async function getAllTasks(filters) {
             filters.status &&
             !Object.values(TaskStatus).includes(filters.status)
         ) {
-            throw new Error('Invalid status filter.')
+            throw new BadRequestError('Invalid status filter.')
         }
 
         if (
             filters.priority &&
             !Object.values(TaskPriority).includes(filters.priority)
         ) {
-            throw new Error('Invalid priority filter.')
+            throw new BadRequestError('Invalid priority filter.')
         }
 
         const tasks = await getAllTasksRepository(filters)
-
         return tasks
     } catch (error) {
         throw error
@@ -79,10 +81,11 @@ export async function getAllTasks(filters) {
 }
 
 // ✅ GET TASK BY ID
+
 export async function getTaskById(taskId) {
     const task = await getTaskByIdRepository(taskId)
     if (!task) {
-        throw new Error('Task not found.')
+        throw new NotFoundError('Task not found.')
     }
     return task
 }
@@ -92,12 +95,12 @@ export async function updateTask(taskId, taskData, userId, userRole) {
     const taskToUpdate = await getTaskByIdRepository(taskId)
 
     if (!taskToUpdate) {
-        throw new Error('Task not found.')
+        throw new NotFoundError('Task not found.')
     }
 
     // Authorization logic: Only the task creator or an ADMIN can update
     if (taskToUpdate.created_by_id !== userId && userRole !== 'ADMIN') {
-        throw new Error('Unauthorized to update this task.')
+        throw new ForbiddenError('Unauthorized to update this task.')
     }
 
     return await updateTaskRepository(taskId, taskData)
@@ -108,11 +111,11 @@ export async function deleteTask(taskId, userId, userRole) {
     const taskToDelete = await getTaskByIdRepository(taskId)
 
     if (!taskToDelete) {
-        throw new Error('Task not found.')
+        throw new NotFoundError('Task not found.')
     }
 
     if (userRole !== 'ADMIN' && taskToDelete.created_by_id !== userId) {
-        throw new Error('Unauthorized to delete this task.')
+        throw new ForbiddenError('Unauthorized to delete this task.')
     }
 
     return await deleteTaskRepository(taskId)

@@ -5,25 +5,30 @@ import {
     updateTask as updateTaskService,
     deleteTask as deleteTaskService,
 } from '../services/task.service.js'
+
 import {
     taskCreateSchema,
     taskUpdateSchema,
 } from '../validators/task.validator.js'
 
-// ✅ CREATE TASK
+/**
+ * ✅ CREATE TASK
+ * Handles task creation with validation using Joi schema.
+ * Ensures the request body is valid and calls the service layer to persist the data.
+ */
 export async function createTask(req, res, next) {
     try {
+        // Validate request body
         const { error, value } = taskCreateSchema.validate(req.body)
-
         if (error) {
-            const errorMessage = error.details[0].message.replace(/"/g, '')
-            return res
-                .status(400)
-                .json({ success: false, message: errorMessage })
+            const message = error.details[0].message.replace(/"/g, '')
+            return res.status(400).json({
+                success: false,
+                message,
+            })
         }
 
         const creatorId = req.user?.userId
-
         const newTask = await createTaskService(value, creatorId)
 
         return res.status(201).json({
@@ -32,6 +37,7 @@ export async function createTask(req, res, next) {
             data: newTask,
         })
     } catch (error) {
+        // Handle not found errors gracefully
         if (error.message.includes('not found')) {
             return res.status(404).json({
                 success: false,
@@ -42,12 +48,15 @@ export async function createTask(req, res, next) {
     }
 }
 
-// ✅ GET ALL TASKS
+/**
+ * ✅ GET ALL TASKS
+ * Retrieves all tasks with optional query filters (status, priority, pagination, etc.).
+ */
 export async function getAllTasks(req, res, next) {
     try {
         const { limit, page, ...filters } = req.query
-
         const tasks = await getAllTasksService({ limit, page, ...filters })
+
         return res.status(200).json({
             success: true,
             message: 'Tasks retrieved successfully',
@@ -59,7 +68,10 @@ export async function getAllTasks(req, res, next) {
     }
 }
 
-// ✅ GET TASK BY ID
+/**
+ * ✅ GET TASK BY ID
+ * Fetches a specific task by its unique ID.
+ */
 export async function getTaskById(req, res, next) {
     try {
         const { id } = req.params
@@ -88,16 +100,21 @@ export async function getTaskById(req, res, next) {
     }
 }
 
-// ✅ UPDATE TASK
+/**
+ * ✅ UPDATE TASK
+ * Updates an existing task if authorized (task creator or Admin).
+ * Uses Joi validation to ensure request body correctness.
+ */
 export async function updateTask(req, res, next) {
     try {
+        // Validate request body
         const { error, value } = taskUpdateSchema.validate(req.body)
-
         if (error) {
-            const errorMessage = error.details[0].message.replace(/"/g, '')
-            return res
-                .status(400)
-                .json({ success: false, message: errorMessage })
+            const message = error.details[0].message.replace(/"/g, '')
+            return res.status(400).json({
+                success: false,
+                message,
+            })
         }
 
         const { id } = req.params
@@ -106,51 +123,56 @@ export async function updateTask(req, res, next) {
 
         const updatedTask = await updateTaskService(id, value, userId, userRole)
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: 'Task updated successfully',
             data: updatedTask,
         })
     } catch (error) {
         if (error.message.includes('not found')) {
-            return res
-                .status(404)
-                .json({ success: false, message: error.message })
+            return res.status(404).json({
+                success: false,
+                message: error.message,
+            })
         }
         if (error.message.includes('Unauthorized')) {
-            return res
-                .status(403)
-                .json({ success: false, message: error.message })
+            return res.status(403).json({
+                success: false,
+                message: error.message,
+            })
         }
         next(error)
     }
 }
 
-// ✅ DELETE TASK
+/**
+ * ✅ DELETE TASK
+ * Deletes a task if authorized (task creator or Admin).
+ */
 export async function deleteTask(req, res, next) {
     try {
         const { id } = req.params
-        const deletedTask = await deleteTaskService(
-            id,
-            req.user.userId,
-            req.user.role
-        )
+        const { userId, role } = req.user
 
-        res.status(200).json({
+        const deletedTask = await deleteTaskService(id, userId, role)
+
+        return res.status(200).json({
             success: true,
             message: 'Task deleted successfully',
             data: deletedTask,
         })
     } catch (error) {
         if (error.message.includes('not found')) {
-            return res
-                .status(404)
-                .json({ success: false, message: error.message })
+            return res.status(404).json({
+                success: false,
+                message: error.message,
+            })
         }
         if (error.message.includes('Unauthorized')) {
-            return res
-                .status(403)
-                .json({ success: false, message: error.message })
+            return res.status(403).json({
+                success: false,
+                message: error.message,
+            })
         }
         next(error)
     }
