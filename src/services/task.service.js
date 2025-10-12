@@ -22,8 +22,20 @@ export async function createTask(taskData, creatorId) {
 
     if (assigned_to_id) {
         const assignee = await findUserById(assigned_to_id)
+
+        if (assigned_to_id === creatorId) {
+            throw new Error('You cannot assign a task to yourself.')
+        }
         if (!assignee) {
             throw new Error('Assignee not found.')
+        }
+
+        if (assignee.role === 'ADMIN') {
+            throw new Error('You cannot assign a task to an Admin.')
+        }
+
+        if (creator.role === 'MANAGER' && assignee.role === 'ADMIN') {
+            throw new Error('Manager cannot assign tasks to an Admin.')
         }
     }
 
