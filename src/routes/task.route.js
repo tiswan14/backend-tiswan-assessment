@@ -5,6 +5,7 @@ import {
     getAllTasks,
     getTaskById,
     updateTask,
+    deleteTask,
 } from '../controllers/task.controller.js'
 import { authenticateToken } from '../middlewares/auth.middleware.js'
 import { authorizeRoles } from '../middlewares/rbac.middleware.js'
@@ -27,6 +28,13 @@ router.patch(
     authenticateToken,
     authorizeRoles('ADMIN', 'MANAGER'),
     updateTask
+)
+
+router.delete(
+    '/tasks/:id',
+    authenticateToken,
+    authorizeRoles('ADMIN', 'MANAGER'),
+    deleteTask
 )
 
 export default router

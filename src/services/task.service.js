@@ -5,6 +5,7 @@ import {
     getAllTasks as getAllTasksRepository,
     getTaskById as getTaskByIdRepository,
     updateTask as updateTaskRepository,
+    deleteTask as deleteTaskRepository,
 } from '../repositories/task.repository.js'
 import { findUserById } from '../repositories/user.repository.js'
 import { TaskStatus, TaskPriority } from '@prisma/client'
@@ -69,4 +70,19 @@ export async function updateTask(taskId, taskData, userId, userRole) {
     }
 
     return await updateTaskRepository(taskId, taskData)
+}
+
+// ✅ DELETE TASK
+export async function deleteTask(taskId, userId, userRole) {
+    const taskToDelete = await getTaskByIdRepository(taskId)
+
+    if (!taskToDelete) {
+        throw new Error('Task not found.')
+    }
+
+    if (userRole !== 'ADMIN' && taskToDelete.created_by_id !== userId) {
+        throw new Error('Unauthorized to delete this task.')
+    }
+
+    return await deleteTaskRepository(taskId)
 }
