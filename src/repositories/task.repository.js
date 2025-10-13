@@ -42,23 +42,31 @@ export async function getAllTasks(filters) {
         where: where,
         take: parsedLimit,
         skip: skip,
-        include: {
+        select: {
+            id: true,
+            title: true,
+            status: true,
+            priority: true,
+            due_date: true,
             created_by: {
                 select: {
                     id: true,
                     name: true,
-                    email: true,
-                    role: true,
                 },
             },
             assigned_to: {
                 select: {
                     id: true,
                     name: true,
-                    email: true,
                 },
             },
-            attachments: true,
+            attachments: {
+                select: {
+                    id: true,
+                    file_name: true,
+                    file_url: true,
+                },
+            },
         },
     })
 }
@@ -101,5 +109,12 @@ export async function deleteTask(taskId) {
         where: {
             id: taskId,
         },
+    })
+}
+
+export async function updateTaskStatus(taskId, newStatus) {
+    return prisma.task.update({
+        where: { id: taskId },
+        data: { status: newStatus },
     })
 }
