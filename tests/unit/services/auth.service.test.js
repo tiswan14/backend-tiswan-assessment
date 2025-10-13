@@ -1,15 +1,14 @@
 // tests/services/auth.service.test.js
-import { authService } from '../../src/services/auth.service.js'
-import * as authRepo from '../../src/repositories/auth.repository.js'
-import * as hashUtils from '../../src/utils/hash.js'
-import * as tokenUtils from '../../src/utils/token.js'
-import * as refreshRepo from '../../src/repositories/refreshToken.repository.js'
+import { authService } from '../../../src/services/auth.service.js'
+import * as authRepo from '../../../src/repositories/auth.repository.js'
+import * as hashUtils from '../../../src/utils/hash.js'
+import * as tokenUtils from '../../../src/utils/token.js'
+import * as refreshRepo from '../../../src/repositories/refreshToken.repository.js'
 
-// path mock harus sama dengan src, bukan ../src
-jest.mock('../../src/repositories/auth.repository.js')
-jest.mock('../../src/utils/hash.js')
-jest.mock('../../src/utils/token.js')
-jest.mock('../../src/repositories/refreshToken.repository.js')
+jest.mock('../../../src/repositories/auth.repository.js')
+jest.mock('../../../src/utils/hash.js')
+jest.mock('../../../src/utils/token.js')
+jest.mock('../../../src/repositories/refreshToken.repository.js')
 
 describe('authService', () => {
     afterEach(() => {

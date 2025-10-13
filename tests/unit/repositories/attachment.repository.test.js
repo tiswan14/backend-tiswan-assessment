@@ -1,12 +1,12 @@
-import { prisma } from '../../src/config/prisma.js'
+import { prisma } from '../../../src/config/prisma.js'
 import {
     createAttachment,
     deleteAttachment,
     getAttachmentById,
-} from '../../src/repositories/attachment.repository.js'
+} from '../../../src/repositories/attachment.repository.js'
 
 // Mock prisma client
-jest.mock('../../src/config/prisma.js', () => ({
+jest.mock('../../../src/config/prisma.js', () => ({
     prisma: {
         attachment: {
             create: jest.fn(),

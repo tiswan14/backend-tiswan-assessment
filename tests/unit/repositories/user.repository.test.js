@@ -1,9 +1,9 @@
 // tests/repositories/user.repository.test.js
-import { prisma } from '../../src/config/prisma.js'
-import { findUserById } from '../../src/repositories/user.repository.js'
+import { prisma } from '../../../src/config/prisma.js'
+import { findUserById } from '../../../src/repositories/user.repository.js'
 
 // Mock Prisma
-jest.mock('../../src/config/prisma.js', () => ({
+jest.mock('../../../src/config/prisma.js', () => ({
     prisma: {
         user: {
             findUnique: jest.fn(),

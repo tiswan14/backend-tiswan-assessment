@@ -2,8 +2,8 @@
 import {
     uploadTaskAttachment,
     handleDeleteAttachment,
-} from '../../src/controllers/attachment.controller.js'
-import * as attachmentService from '../../src/services/attachment.service.js'
+} from '../../../src/controllers/attachment.controller.js'
+import * as attachmentService from '../../../src/services/attachment.service.js'
 
 describe('Attachment Controller', () => {
     let req, res, next

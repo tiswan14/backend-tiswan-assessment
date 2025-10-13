@@ -1,5 +1,5 @@
 // tests/repositories/task.repository.test.js
-import { prisma } from '../../src/config/prisma.js'
+import { prisma } from '../../../src/config/prisma.js'
 import {
     createTask,
     getAllTasks,
@@ -7,10 +7,10 @@ import {
     updateTask,
     deleteTask,
     updateTaskStatus,
-} from '../../src/repositories/task.repository.js'
+} from '../../../src/repositories/task.repository.js'
 
 // Mock Prisma
-jest.mock('../../src/config/prisma.js', () => ({
+jest.mock('../../../src/config/prisma.js', () => ({
     prisma: {
         task: {
             create: jest.fn(),

@@ -1,5 +1,5 @@
 // tests/utils/hash.test.js
-import * as hashUtils from '../../src/utils/hash.js'
+import * as hashUtils from '../../../src/utils/hash.js'
 import bcrypt from 'bcrypt'
 
 // Mock bcrypt agar tidak melakukan hashing asli

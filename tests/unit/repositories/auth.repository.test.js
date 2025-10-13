@@ -1,11 +1,11 @@
-import { prisma } from '../../src/config/prisma.js'
+import { prisma } from '../../../src/config/prisma.js'
 import {
     createUser,
     findUserByEmail,
-} from '../../src/repositories/auth.repository.js'
+} from '../../../src/repositories/auth.repository.js'
 
 // Mock prisma client
-jest.mock('../../src/config/prisma.js', () => ({
+jest.mock('../../../src/config/prisma.js', () => ({
     prisma: {
         user: {
             create: jest.fn(),

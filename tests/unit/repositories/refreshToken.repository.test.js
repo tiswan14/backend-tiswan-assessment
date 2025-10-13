@@ -1,13 +1,13 @@
 // tests/repositories/refreshToken.repository.test.js
-import { prisma } from '../../src/config/prisma.js'
+import { prisma } from '../../../src/config/prisma.js'
 import {
     createRefreshToken,
     findRefreshToken,
     deleteRefreshToken,
-} from '../../src/repositories/refreshToken.repository.js'
+} from '../../../src/repositories/refreshToken.repository.js'
 
 // Mock prisma client
-jest.mock('../../src/config/prisma.js', () => ({
+jest.mock('../../../src/config/prisma.js', () => ({
     prisma: {
         refreshToken: {
             create: jest.fn(),

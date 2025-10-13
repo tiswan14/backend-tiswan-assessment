@@ -1,9 +1,9 @@
 // tests/controller/task.controller.test.js
-import * as taskController from '../../src/controllers/task.controller.js'
-import * as taskService from '../../src/services/task.service.js'
+import * as taskController from '../../../src/controllers/task.controller.js'
+import * as taskService from '../../../src/services/task.service.js'
 
 // Mock seluruh service
-jest.mock('../../src/services/task.service.js')
+jest.mock('../../../src/services/task.service.js')
 
 describe('Task Controller', () => {
     let req, res, next

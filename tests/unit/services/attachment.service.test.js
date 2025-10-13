@@ -1,18 +1,18 @@
 import {
     uploadFile,
     deleteAttachmentService,
-} from '../../src/services/attachment.service.js'
-import * as taskRepo from '../../src/repositories/task.repository.js'
-import * as attachmentRepo from '../../src/repositories/attachment.repository.js'
+} from '../../../src/services/attachment.service.js'
+import * as taskRepo from '../../../src/repositories/task.repository.js'
+import * as attachmentRepo from '../../../src/repositories/attachment.repository.js'
 import { put, del } from '@vercel/blob'
 import {
     ForbiddenError,
     NotFoundError,
-} from '../../src/errors/constum.error.js'
+} from '../../../src/errors/constum.error.js'
 
 // Mock semua dependensi
-jest.mock('../../src/repositories/task.repository.js')
-jest.mock('../../src/repositories/attachment.repository.js')
+jest.mock('../../../src/repositories/task.repository.js')
+jest.mock('../../../src/repositories/attachment.repository.js')
 jest.mock('@vercel/blob', () => ({
     put: jest.fn(),
     del: jest.fn(),

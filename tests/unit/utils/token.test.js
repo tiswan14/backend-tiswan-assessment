@@ -1,4 +1,4 @@
-import * as tokenUtils from '../../src/utils/token.js'
+import * as tokenUtils from '../../../src/utils/token.js'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 

@@ -1,24 +1,24 @@
-// tests/services/task.service.test.js
+// tests/unit/services/task.service.test.js
 import {
     createTask,
     getAllTasks,
     getTaskById,
     updateTask,
     deleteTask,
-} from '../../src/services/task.service.js'
+} from '../../../src/services/task.service.js'
 
-import * as taskRepo from '../../src/repositories/task.repository.js'
-import * as userRepo from '../../src/repositories/user.repository.js'
+import * as taskRepo from '../../../src/repositories/task.repository.js'
+import * as userRepo from '../../../src/repositories/user.repository.js'
 import { TaskStatus, TaskPriority } from '@prisma/client'
 import {
     NotFoundError,
     BadRequestError,
     ForbiddenError,
-} from '../../src/errors/constum.error.js' // perbaiki path error class
+} from '../../../src/errors/constum.error.js' // path sudah benar
 
 // Mock semua repository
-jest.mock('../../src/repositories/task.repository.js')
-jest.mock('../../src/repositories/user.repository.js')
+jest.mock('../../../src/repositories/task.repository.js')
+jest.mock('../../../src/repositories/user.repository.js')
 
 describe('taskService', () => {
     beforeEach(() => {

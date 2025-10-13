@@ -3,11 +3,11 @@ import {
     register,
     login,
     refresh,
-} from '../../src/controllers/auth.controller.js'
-import { authService } from '../../src/services/auth.service.js'
+} from '../../../src/controllers/auth.controller.js'
+import { authService } from '../../../src/services/auth.service.js'
 
 // Mock authService sesuai named export
-jest.mock('../../src/services/auth.service.js', () => ({
+jest.mock('../../../src/services/auth.service.js', () => ({
     authService: {
         registerUser: jest.fn(),
         loginUser: jest.fn(),
