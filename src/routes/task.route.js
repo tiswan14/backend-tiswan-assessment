@@ -7,8 +7,10 @@ import {
     updateTask,
     deleteTask,
 } from '../controllers/task.controller.js'
+import { uploadTaskAttachment } from '../controllers/attachment.controller.js'
 import { authenticateToken } from '../middlewares/auth.middleware.js'
 import { authorizeRoles } from '../middlewares/rbac.middleware.js'
+import { upload } from '../middlewares/upload.middleware.js'
 
 const router = express.Router()
 
@@ -35,6 +37,13 @@ router.delete(
     authenticateToken,
     authorizeRoles('ADMIN', 'MANAGER'),
     deleteTask
+)
+
+router.post(
+    '/tasks/:taskId/attachments',
+    authenticateToken,
+    upload.single('file'),
+    uploadTaskAttachment
 )
 
 export default router

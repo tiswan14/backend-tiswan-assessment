@@ -16,6 +16,7 @@ export const authenticateToken = (req, res, next) => {
                 .status(403)
                 .json({ message: 'Invalid or expired token.' })
         }
+
         req.user = user
         next()
     })
