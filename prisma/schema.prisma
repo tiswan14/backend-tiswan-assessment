@@ -50,9 +50,9 @@ model Task {
   priority    TaskPriority @default(MEDIUM)
   due_date    DateTime
 
-  created_by     User    @relation("CreatedTasks", fields: [created_by_id], references: [id])
-  created_by_id  String
-  assigned_to    User?   @relation("AssignedTasks", fields: [assigned_to_id], references: [id])
+  created_by     User?   @relation("CreatedTasks", fields: [created_by_id], references: [id], onDelete: SetNull)
+  created_by_id  String?
+  assigned_to    User?   @relation("AssignedTasks", fields: [assigned_to_id], references: [id], onDelete: SetNull)
   assigned_to_id String?
 
   attachments Attachment[]
@@ -76,7 +76,7 @@ model Attachment {
 
 model RefreshToken {
   id         String   @id @default(cuid())
-  user       User     @relation(fields: [user_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id    String
   token      String
   expires_at DateTime
