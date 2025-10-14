@@ -1,7 +1,10 @@
 import { findUserByEmail, createUser } from '../repositories/auth.repository.js'
 import { hashPassword, comparePassword } from '../utils/hash.js'
 import { generateAccessToken, generateRefreshToken } from '../utils/token.js'
-import { createRefreshToken } from '../repositories/refreshToken.repository.js'
+import {
+    createRefreshToken,
+    deleteRefreshTokensByUserId,
+} from '../repositories/refreshToken.repository.js'
 
 export const authService = {
     // Fungsi registerUser
@@ -50,5 +53,10 @@ export const authService = {
         await createRefreshToken(user.id, refreshToken, expiresAt)
 
         return { accessToken, refreshToken }
+    },
+
+    logoutUser: async (userId) => {
+        await deleteRefreshTokensByUserId(userId)
+        return { message: 'Logout successful' }
     },
 }
