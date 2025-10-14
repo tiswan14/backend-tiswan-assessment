@@ -1,6 +1,5 @@
 import { put, del } from '@vercel/blob'
 import slugify from 'slugify'
-import { createAttachment } from '../repositories/attachment.repository.js'
 
 import { ForbiddenError, NotFoundError } from '../errors/constum.error.js'
 import {
@@ -12,57 +11,76 @@ import {
     getAttachmentById,
 } from '../repositories/attachment.repository.js'
 
+import { prisma } from '../config/prisma.js'
+
 export async function uploadFile(file, taskId, userId) {
-    const task = await getTaskById(taskId)
-    if (!task) throw new NotFoundError('Task not found.')
+    return await prisma.$transaction(async (tx) => {
+        const task = await tx.task.findUnique({
+            where: { id: taskId },
+            include: {
+                created_by: true,
+                assigned_to: true,
+            },
+        })
 
-    if (task.status === 'DONE') {
-        throw new ForbiddenError(
-            'Cannot upload attachment. Task already completed.'
-        )
-    }
+        if (!task) throw new NotFoundError('Task not found.')
 
-    if (task.assigned_to_id !== userId) {
-        throw new ForbiddenError(
-            'You are not allowed to upload a file for this task.'
-        )
-    }
+        if (task.status === 'DONE') {
+            throw new ForbiddenError(
+                'Cannot upload attachment. Task already completed.'
+            )
+        }
 
-    const creatorName = task.created_by?.name || 'unknown_creator'
-    const assigneeName = task.assigned_to?.name || 'unknown_user'
-    const safeCreator = slugify(creatorName, { lower: true, strict: true })
-    const safeAssignee = slugify(assigneeName, { lower: true, strict: true })
-    const timestamp = Date.now()
-    const filePath = `tasks/${safeCreator}/${safeAssignee}/${timestamp}-${file.originalname}`
+        if (task.assigned_to_id !== userId) {
+            throw new ForbiddenError(
+                'You are not allowed to upload a file for this task.'
+            )
+        }
 
-    const blob = await put(filePath, file.buffer, {
-        access: 'public',
-        token: process.env.BLOB_READ_WRITE_TOKEN,
+        const creatorName = task.created_by?.name || 'unknown_creator'
+        const assigneeName = task.assigned_to?.name || 'unknown_user'
+        const safeCreator = slugify(creatorName, { lower: true, strict: true })
+        const safeAssignee = slugify(assigneeName, {
+            lower: true,
+            strict: true,
+        })
+        const timestamp = Date.now()
+        const filePath = `tasks/${safeCreator}/${safeAssignee}/${timestamp}-${file.originalname}`
+
+        const blob = await put(filePath, file.buffer, {
+            access: 'public',
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+        })
+
+        const newAttachment = await tx.attachment.create({
+            data: {
+                file_url: blob.url,
+                file_name: blob.pathname,
+                mime_type: file.mimetype,
+                task_id: taskId,
+            },
+        })
+
+        let newStatus = task.status
+        if (task.status === 'TODO') newStatus = 'IN_PROGRESS'
+        else if (task.status === 'IN_PROGRESS') newStatus = 'DONE'
+
+        if (newStatus !== task.status) {
+            await tx.task.update({
+                where: { id: taskId },
+                data: { status: newStatus },
+            })
+        }
+
+        return {
+            success: true,
+            message: 'Attachment uploaded successfully.',
+            data: {
+                attachment: newAttachment,
+                new_status: newStatus,
+            },
+        }
     })
-
-    const newAttachment = await createAttachment({
-        file_url: blob.url,
-        file_name: blob.pathname,
-        mime_type: file.mimetype,
-        task_id: taskId,
-    })
-
-    let newStatus = task.status
-    if (task.status === 'TODO') newStatus = 'IN_PROGRESS'
-    else if (task.status === 'IN_PROGRESS') newStatus = 'DONE'
-
-    if (newStatus !== task.status) {
-        await updateTaskStatus(taskId, newStatus)
-    }
-
-    return {
-        success: true,
-        message: 'Attachment uploaded successfully.',
-        data: {
-            attachment: newAttachment,
-            new_status: newStatus,
-        },
-    }
 }
 
 export async function deleteAttachmentService(attachmentId, userId, userRole) {

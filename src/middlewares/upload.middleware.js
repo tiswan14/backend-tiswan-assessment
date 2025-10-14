@@ -21,8 +21,26 @@ export const upload = multer({
         if (!allowedMimeTypes.includes(file.mimetype)) {
             return cb(
                 new Error(
-                    `Tipe file tidak diizinkan. Hanya boleh: ${allowedMimeTypes
-                        .map((t) => t.split('/')[1])
+                    `File type not allowed. Only allowed: ${allowedMimeTypes
+                        .map((type) => {
+                            // Convert MIME types to user-friendly format
+                            const parts = type.split('/')
+                            if (parts[0] === 'image') {
+                                return parts[1] === 'jpeg' ? 'jpg' : parts[1]
+                            } else if (parts[0] === 'application') {
+                                switch (parts[1]) {
+                                    case 'pdf':
+                                        return 'pdf'
+                                    case 'msword':
+                                        return 'doc'
+                                    case 'vnd.openxmlformats-officedocument.wordprocessingml.document':
+                                        return 'docx'
+                                    default:
+                                        return parts[1]
+                                }
+                            }
+                            return parts[1]
+                        })
                         .join(', ')}`
                 ),
                 false
