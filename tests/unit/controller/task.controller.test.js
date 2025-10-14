@@ -1,4 +1,4 @@
-// tests/controller/task.controller.test.js
+// tests/unit/controller/task.controller.test.js
 import * as taskController from '../../../src/controllers/task.controller.js'
 import * as taskService from '../../../src/services/task.service.js'
 
@@ -10,7 +10,7 @@ describe('Task Controller', () => {
     const mockTask = {
         id: '1',
         title: 'Test Task',
-        status: 'LOW',
+        status: 'TODO',
         priority: 'LOW',
         due_date: new Date(Date.now() + 86400000),
     }
@@ -52,7 +52,7 @@ describe('Task Controller', () => {
         })
 
         it('should return 400 if validation fails', async () => {
-            req.body.title = 'ab' // terlalu pendek
+            req.body.title = 'ab' // terlalu pende
 
             await taskController.createTask(req, res, next)
 

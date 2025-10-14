@@ -1,9 +1,29 @@
 import { prisma } from '../config/prisma.js'
 
 export async function createTask(taskData) {
-    return await prisma.task.create({
+    const task = await prisma.task.create({
         data: taskData,
+        include: {
+            created_by: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+            assigned_to: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
     })
+
+    return {
+        success: true,
+        message: 'Task created successfully',
+        data: task,
+    }
 }
 
 export async function getAllTasks(filters) {
