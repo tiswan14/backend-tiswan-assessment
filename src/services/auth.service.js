@@ -59,4 +59,35 @@ export const authService = {
         await deleteRefreshTokensByUserId(userId)
         return { message: 'Logout successful' }
     },
+    refreshToken: async (token) => {
+        const jwt = await import('jsonwebtoken')
+        const { prisma } = await import('../config/prisma.js')
+
+        if (!token) throw new Error('Refresh token is required')
+
+        const storedToken = await prisma.refreshToken.findFirst({
+            where: { token },
+            include: { user: true },
+        })
+        if (!storedToken) throw new Error('Invalid refresh token')
+
+        if (storedToken.expires_at < new Date()) {
+            throw new Error('Refresh token expired')
+        }
+
+        const user = storedToken.user
+        if (!user) throw new Error('User not found')
+
+        const newAccessToken = jwt.default.sign(
+            {
+                userId: user.id,
+                email: user.email,
+                role: user.role,
+            },
+            process.env.JWT_ACCESS_SECRET,
+            { expiresIn: '15m' }
+        )
+
+        return { accessToken: newAccessToken }
+    },
 }
