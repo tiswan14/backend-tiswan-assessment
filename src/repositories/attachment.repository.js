@@ -39,3 +39,9 @@ export async function getAttachmentById(id) {
         },
     })
 }
+
+export async function getAttachmentsByTaskId(taskId) {
+    return await prisma.attachment.findMany({
+        where: { task_id: taskId },
+    })
+}

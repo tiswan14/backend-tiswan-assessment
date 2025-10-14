@@ -84,31 +84,74 @@ export async function uploadFile(file, taskId, userId) {
 }
 
 export async function deleteAttachmentService(attachmentId, userId, userRole) {
-    const attachment = await getAttachmentById(attachmentId)
-    if (!attachment) throw new NotFoundError('Attachment not found.')
+    return await prisma.$transaction(async (tx) => {
+        const attachment = await tx.attachment.findUnique({
+            where: { id: attachmentId },
+            include: {
+                task: {
+                    include: {
+                        created_by: true,
+                        assigned_to: true,
+                    },
+                },
+            },
+        })
 
-    const task = await getTaskById(attachment.task_id)
-    if (!task) throw new NotFoundError('Task not found.')
+        if (!attachment) throw new NotFoundError('Attachment not found.')
 
-    if (
-        task.assigned_to_id !== userId &&
-        task.created_by_id !== userId &&
-        userRole !== 'ADMIN'
-    ) {
-        throw new ForbiddenError(
-            'You are not allowed to delete this attachment.'
-        )
-    }
+        const task = attachment.task
+        if (!task) throw new NotFoundError('Task not found.')
 
-    await del(attachment.file_url, {
-        token: process.env.BLOB_READ_WRITE_TOKEN,
+        const isAuthorized =
+            task.assigned_to_id === userId ||
+            task.created_by_id === userId ||
+            userRole === 'ADMIN'
+
+        if (!isAuthorized)
+            throw new ForbiddenError(
+                'You are not allowed to delete this attachment.'
+            )
+
+        // Strict workflow: block deletion if task is DONE (except ADMIN)
+        if (task.status === 'DONE' && userRole !== 'ADMIN') {
+            throw new ForbiddenError(
+                'Cannot delete attachment from a completed task.'
+            )
+        }
+
+        // Delete file from blob storage
+        await del(attachment.file_url, {
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+        })
+
+        // Delete attachment from DB
+        await tx.attachment.delete({ where: { id: attachmentId } })
+
+        const remaining = await tx.attachment.findMany({
+            where: { task_id: task.id },
+            select: { id: true },
+        })
+
+        let newStatus = task.status
+        if (userRole === 'ADMIN' || task.status !== 'DONE') {
+            if (remaining.length === 0) newStatus = 'TODO'
+            else if (remaining.length === 1) newStatus = 'IN_PROGRESS'
+        }
+
+        if (newStatus !== task.status) {
+            await tx.task.update({
+                where: { id: task.id },
+                data: { status: newStatus },
+            })
+        }
+
+        return {
+            success: true,
+            message: 'Attachment deleted successfully.',
+            data: {
+                deleted_attachment_id: attachmentId,
+                new_status: newStatus,
+            },
+        }
     })
-
-    const deleted = await deleteAttachment(attachmentId)
-
-    return {
-        success: true,
-        message: 'Attachment deleted successfully.',
-        data: deleted,
-    }
 }
