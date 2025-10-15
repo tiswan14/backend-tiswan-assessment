@@ -62,6 +62,8 @@ model Task {
 
   @@index([created_by_id])
   @@index([assigned_to_id])
+  @@index([status])
+  @@index([priority])
 }
 
 model Attachment {
@@ -72,12 +74,14 @@ model Attachment {
   file_url    String
   mime_type   String
   uploaded_at DateTime @default(now())
+
+  @@index([task_id])
 }
 
 model RefreshToken {
   id         String   @id @default(cuid())
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id    String
-  token      String
+  token      String @unique
   expires_at DateTime
 }
