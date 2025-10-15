@@ -1,41 +1,100 @@
-// tests/repositories/user.repository.test.js
 import { prisma } from '../../../src/config/prisma.js'
-import { findUserById } from '../../../src/repositories/user.repository.js'
+import {
+    createTask,
+    getAllTasks,
+    getTaskById,
+    updateTask,
+    deleteTask,
+    updateTaskStatus,
+} from '../../../src/repositories/task.repository.js'
 
-// Mock Prisma
 jest.mock('../../../src/config/prisma.js', () => ({
     prisma: {
-        user: {
+        task: {
+            create: jest.fn(),
+            findMany: jest.fn(),
             findUnique: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
         },
     },
 }))
 
-describe('user.repository', () => {
-    beforeEach(() => {
-        jest.clearAllMocks()
+describe('🧩 task.repository Unit Tests', () => {
+    afterEach(() => jest.clearAllMocks())
+
+    it('✅ should create a task successfully', async () => {
+        const mockTask = { id: 1, title: 'Task A' }
+        prisma.task.create.mockResolvedValue(mockTask)
+
+        const result = await createTask({ title: 'Task A' })
+
+        expect(prisma.task.create).toHaveBeenCalledWith({
+            data: { title: 'Task A' },
+            include: expect.any(Object),
+        })
+        expect(result).toEqual({
+            success: true,
+            message: 'Task created successfully',
+            data: mockTask,
+        })
     })
 
-    describe('findUserById', () => {
-        it('should return user if found', async () => {
-            const fakeUser = { id: 1, name: 'John Doe' }
-            prisma.user.findUnique.mockResolvedValue(fakeUser)
+    it('✅ should get all tasks', async () => {
+        const mockTasks = [{ id: 1 }, { id: 2 }]
+        prisma.task.findMany.mockResolvedValue(mockTasks)
 
-            const result = await findUserById(1)
-            expect(result).toEqual(fakeUser)
-            expect(prisma.user.findUnique).toHaveBeenCalledWith({
-                where: { id: 1 },
-            })
+        const result = await getAllTasks({ page: 1, limit: 10 })
+
+        expect(prisma.task.findMany).toHaveBeenCalledWith(expect.any(Object))
+        expect(result).toEqual(mockTasks)
+    })
+
+    it('✅ should get task by ID', async () => {
+        const mockTask = { id: 1, title: 'Test' }
+        prisma.task.findUnique.mockResolvedValue(mockTask)
+
+        const result = await getTaskById(1)
+
+        expect(prisma.task.findUnique).toHaveBeenCalledWith({
+            where: { id: 1 },
+            include: expect.any(Object),
         })
+        expect(result).toEqual(mockTask)
+    })
 
-        it('should return null if user not found', async () => {
-            prisma.user.findUnique.mockResolvedValue(null)
+    it('✅ should update task successfully', async () => {
+        prisma.task.update.mockResolvedValue({ id: 1, title: 'Updated' })
 
-            const result = await findUserById(99)
-            expect(result).toBeNull()
-            expect(prisma.user.findUnique).toHaveBeenCalledWith({
-                where: { id: 99 },
-            })
+        const result = await updateTask(1, { title: 'Updated' })
+
+        expect(prisma.task.update).toHaveBeenCalledWith({
+            where: { id: 1 },
+            data: { title: 'Updated' },
         })
+        expect(result).toEqual({ id: 1, title: 'Updated' })
+    })
+
+    it('✅ should delete task successfully', async () => {
+        prisma.task.delete.mockResolvedValue(true)
+
+        const result = await deleteTask(1)
+
+        expect(prisma.task.delete).toHaveBeenCalledWith({
+            where: { id: 1 },
+        })
+        expect(result).toBe(true)
+    })
+
+    it('✅ should update task status', async () => {
+        prisma.task.update.mockResolvedValue({ id: 1, status: 'DONE' })
+
+        const result = await updateTaskStatus(1, 'DONE')
+
+        expect(prisma.task.update).toHaveBeenCalledWith({
+            where: { id: 1 },
+            data: { status: 'DONE' },
+        })
+        expect(result).toEqual({ id: 1, status: 'DONE' })
     })
 })
