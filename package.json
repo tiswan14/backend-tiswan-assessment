@@ -13,7 +13,8 @@
         "test:report:html": "marge reports/mochawesome/merged.json -f full_integration_report -o reports/mochawesome",
         "test:integration:full": "npm run test:integration && timeout /t 2 > NUL && npm run test:report:merge && npm run test:report:html",
         "dev": "nodemon src/server.js",
-        "start": "node src/server.js"
+        "start": "node src/server.js",
+        "build": "npx prisma generate"
     },
     "keywords": [],
     "author": "",
