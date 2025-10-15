@@ -317,7 +317,11 @@ Authorization: Bearer <token>
 
 ---
 
-#### **GET /api/tasks**
+
+**Example Filter** 
+#### **GET /api/tasks?status=IN_PROGRESS&priority=HIGH**
+
+#### **GET /api/tasks?assigned_to_id=user123**
 
 Retrieves all tasks with filtering and pagination.
 
@@ -483,9 +487,6 @@ You may include:
 
 ### 🧠 **Evaluation Notes (Based on Assessment Document)**
 
-```markdown
-## 🧠 Evaluation Notes (Based on Assessment Document)
-
 This project aligns with the **Backend Developer requirements** outlined by UPT TIK UNPER × PT Novatec Solution, covering:
 
 -   ✅ Proper RESTful API design & HTTP status codes
@@ -506,4 +507,7 @@ This project aligns with the **Backend Developer requirements** outlined by UPT 
 
 **Tiswan**  
 Backend Developer Candidate — UPT TIK UNPER × PT Novatec Solution 2025
+
+```
+
 ```
