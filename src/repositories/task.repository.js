@@ -138,3 +138,9 @@ export async function updateTaskStatus(taskId, newStatus) {
         data: { status: newStatus },
     })
 }
+
+export async function findTaskByTitle(title) {
+    return prisma.task.findFirst({
+        where: { title },
+    })
+}

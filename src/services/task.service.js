@@ -6,10 +6,12 @@ import {
     deleteTask as deleteTaskRepository,
 } from '../repositories/task.repository.js'
 import { findUserById } from '../repositories/user.repository.js'
+import { findTaskByTitle } from '../repositories/task.repository.js'
 import {
     BadRequestError,
     NotFoundError,
     ForbiddenError,
+    ConflictError,
 } from '../errors/constum.error.js'
 import { TaskStatus, TaskPriority } from '@prisma/client'
 
@@ -40,6 +42,11 @@ export async function createTask(taskData, creatorId) {
         if (creator.role === 'MANAGER' && assignee.role === 'ADMIN') {
             throw new ForbiddenError('Manager cannot assign tasks to an Admin.')
         }
+    }
+
+    const existingTask = await findTaskByTitle(title)
+    if (existingTask) {
+        throw new ConflictError('Task title already exists.')
     }
 
     const newTaskData = {
