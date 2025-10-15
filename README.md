@@ -509,15 +509,17 @@ npm run test:unit
 
 # 🔗 Run Integration Tests (Mocha + Chai + Supertest)
 npm run test:integration:full
-🧩 Optional Additions
+```
+
+## 🧩 Optional Additions
 
 You may include:
 
-🗂 ERD Diagram / Database Schema → docs/ERD_Task_Management_API.png
+# 🗂 ERD Diagram / Database Schema → docs/ERD_Task_Management_API.png
 
-🔍 Postman Collection → docs/Task_Management_API-Tiswan.postman_collection.json
+# 🔍 Postman Collection → docs/Task_Management_API-Tiswan.postman_collection.json
 
-🧠 Evaluation Notes (Based on Assessment Document)
+# 🧠 Evaluation Notes (Based on Assessment Document)
 
 This project aligns with the Backend Developer requirements outlined by UPT TIK UNPER × PT Novatec Solution, covering:
 
@@ -547,8 +549,11 @@ This project aligns with the Backend Developer requirements outlined by UPT TIK 
 
 ✅ Git best practices (conventional commits, branching, and documentation completeness)
 
-👨‍💻 Author
+## 👨‍💻 Author
 
 Tiswan
 Backend Developer Candidate — UPT TIK UNPER × PT Novatec Solution 2025
+
+```
+
 ```
