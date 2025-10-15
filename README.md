@@ -515,45 +515,28 @@ npm run test:integration:full
 
 You may include:
 
-# 🗂 ERD Diagram / Database Schema → docs/ERD_Task_Management_API.png
+-   🗂 **ERD Diagram / Database Schema:** [ERD_Task_Management_API.png](docs/ERD_Task_Management_API.png)
+-   🔍 **Postman Collection:** [Task_Management_API-Tiswan.postman_collection.json](docs/Task_Management_API-Tiswan.postman_collection.json)
 
-# 🔍 Postman Collection → docs/Task_Management_API-Tiswan.postman_collection.json
+### 🧠 Evaluation Notes (Based on Assessment Document)
 
-# 🧠 Evaluation Notes (Based on Assessment Document)
+This project aligns with the **Backend Developer requirements** outlined by **UPT TIK UNPER × PT Novatec Solution**, covering:
 
-This project aligns with the Backend Developer requirements outlined by UPT TIK UNPER × PT Novatec Solution, covering:
-
-✅ Proper RESTful API design & HTTP status codes
-
-✅ Layered architecture (Controller–Service–Repository pattern)
-
-✅ Environment-based configuration management
-
-✅ JWT authentication with Role-Based Access Control (RBAC)
-
-✅ Rate limiting middleware to prevent brute-force attacks
-
-✅ Transaction management & data consistency with Prisma ORM
-
-✅ CRUD operations for tasks and users
-
-✅ File upload & deletion via Vercel Blob integration
-
-✅ Task filtering by status, priority, and assigned user with pagination (default: 10 per page)
-
-✅ Database indexing on key columns for optimized performance
-
-✅ Centralized error handling with custom error classes
-
-✅ Unit & Integration test readiness
-
-✅ Git best practices (conventional commits, branching, and documentation completeness)
+-   ✅ Proper RESTful API design & HTTP status codes
+-   ✅ Layered architecture (**Controller–Service–Repository pattern**)
+-   ✅ Environment-based configuration management
+-   ✅ JWT authentication with **Role-Based Access Control (RBAC)**
+-   ✅ Rate limiting middleware to prevent brute-force attacks
+-   ✅ Transaction management & data consistency using **Prisma ORM**
+-   ✅ CRUD operations for tasks and users
+-   ✅ File upload & deletion via **Vercel Blob integration**
+-   ✅ Task filtering by status, priority, and assigned user with pagination _(default: 10 per page)_
+-   ✅ Database indexing on key columns for optimized performance
+-   ✅ Centralized error handling with custom error classes
+-   ✅ Unit & Integration test readiness
+-   ✅ Git best practices _(conventional commits, branching, and documentation completeness)_
 
 ## 👨‍💻 Author
 
-Tiswan
-Backend Developer Candidate — UPT TIK UNPER × PT Novatec Solution 2025
-
-```
-
-```
+**Tiswan**  
+_Backend Developer Candidate — UPT TIK UNPER × PT Novatec Solution 2025_
