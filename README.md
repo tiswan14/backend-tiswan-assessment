@@ -455,10 +455,6 @@ Authorization: Bearer <token>
 
 ---
 
-````
-
----
-
 ### ⚙️ HTTP Status Code Summary
 
 | Code                 | Meaning                  | Used In                         |
@@ -471,34 +467,34 @@ Authorization: Bearer <token>
 | **404 Not Found**    | Resource not found       | User, Task, Attachment          |
 | **409 Conflict**     | Duplicate entry          | Register (email exists)         |
 
-
+---
 
 ## 🧪 Test Reports Overview
 
-This directory contains the **automated test reports** generated from both the unit tests and integration tests of this project.
-These reports provide detailed insights into test coverage, performance, and stability across the application.
+This directory contains the **automated test reports** generated from both the unit tests and integration tests of this project.  
+These reports provide detailed insights into **test coverage**, **performance**, and **stability** across the application.
 
 ---
 
 ## 📁 Directory
 
-- **Integration Test Report:** [`docs/integration-test-report/index.html`](docs/integration-test-report/index.html)
-- **Unit Test Report:** [`docs/unit-test-report/index.html`](docs/unit-test-report/index.html)
+-   **Integration Test Report:** [`docs/integration-test-report/index.html`](docs/integration-test-report/index.html)
+-   **Unit Test Report:** [`docs/unit-test-report/index.html`](docs/unit-test-report/index.html)
 
 ---
 
 ## 🧪 Automated Testing & Reporting Guide
 
-This project includes a **complete testing environment** to ensure code quality, maintainability, and production reliability.
-It uses both **Unit Tests** and **Integration Tests**, with automated reporting in the form of **HTML, JSON, and coverage reports**.
+This project includes a **complete testing environment** to ensure code quality, maintainability, and production reliability.  
+It uses both **Unit Tests** and **Integration Tests**, with automated reporting in **HTML**, **JSON**, and **coverage** formats.
 
 ---
 
 ## 📘 Overview
 
-| Type | Frameworks Used | Purpose |
-|------|------------------|----------|
-| **Unit Tests** | Jest | Validate individual modules, functions, and business logic. |
+| Type                  | Frameworks Used                        | Purpose                                                                          |
+| --------------------- | -------------------------------------- | -------------------------------------------------------------------------------- |
+| **Unit Tests**        | Jest                                   | Validate individual modules, functions, and business logic.                      |
 | **Integration Tests** | Mocha + Chai + Supertest + Mochawesome | Validate the interaction between API endpoints, middleware, and database layers. |
 
 ---
@@ -513,40 +509,46 @@ npm run test:unit
 
 # 🔗 Run Integration Tests (Mocha + Chai + Supertest)
 npm run test:integration:full
-
-## 🧩 Optional Additions
+🧩 Optional Additions
 
 You may include:
 
--   🗂 **ERD Diagram / Database Schema** → `docs/ERD_Task_Management_API.png`
--   🔍 **Postman Collection** → `docs/Task_Management_API-Tiswan.postman_collection.json`
+🗂 ERD Diagram / Database Schema → docs/ERD_Task_Management_API.png
 
----
+🔍 Postman Collection → docs/Task_Management_API-Tiswan.postman_collection.json
 
-### 🧠 **Evaluation Notes (Based on Assessment Document)**
+🧠 Evaluation Notes (Based on Assessment Document)
 
-This project aligns with the **Backend Developer requirements** outlined by UPT TIK UNPER × PT Novatec Solution, covering:
+This project aligns with the Backend Developer requirements outlined by UPT TIK UNPER × PT Novatec Solution, covering:
 
--   ✅ Proper RESTful API design & HTTP status codes
--   ✅ Layered architecture (Controller–Service–Repository pattern)
--   ✅ Environment-based configuration management
--   ✅ JWT authentication with role-based access control (RBAC)
--   ✅ Rate limiting middleware to prevent brute-force attacks on auth routes
--   ✅ Transaction management and data consistency using Prisma ORM
--   ✅ CRUD operations for tasks and users
--   ✅ File upload and deletion via Vercel Blob integration
--   ✅ Task filtering by status, priority, and assigned user with pagination support (default limit 10, page 1)
--   ✅ Database indexing on foreign keys and query columns (`created_by_id`, `assigned_to_id`, `status`, `priority`, `task_id`) for optimized performance
--   ✅ Centralized error handling with custom error classes
--   ✅ Unit and integration test readiness
--   ✅ Git best practices (conventional commits, branching, and documentation completeness)
+✅ Proper RESTful API design & HTTP status codes
 
-## 👨‍💻 Author
+✅ Layered architecture (Controller–Service–Repository pattern)
 
-**Tiswan**
+✅ Environment-based configuration management
+
+✅ JWT authentication with Role-Based Access Control (RBAC)
+
+✅ Rate limiting middleware to prevent brute-force attacks
+
+✅ Transaction management & data consistency with Prisma ORM
+
+✅ CRUD operations for tasks and users
+
+✅ File upload & deletion via Vercel Blob integration
+
+✅ Task filtering by status, priority, and assigned user with pagination (default: 10 per page)
+
+✅ Database indexing on key columns for optimized performance
+
+✅ Centralized error handling with custom error classes
+
+✅ Unit & Integration test readiness
+
+✅ Git best practices (conventional commits, branching, and documentation completeness)
+
+👨‍💻 Author
+
+Tiswan
 Backend Developer Candidate — UPT TIK UNPER × PT Novatec Solution 2025
-
 ```
-
-```
-````
