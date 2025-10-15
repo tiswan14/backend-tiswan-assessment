@@ -4,7 +4,14 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "cross-env NODE_ENV=test mocha 'tests/integration/**/*.test.js' --timeout 10000 --exit",
+        "test:unit": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --coverage --testPathPatterns=tests/unit/",
+        "test:integration:jest": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --coverage --testPathPatterns=tests/integration",
+        "test:watch": "cross-env NODE_ENV=test jest --watchAll",
+        "test:integration": "cross-env NODE_ENV=test mocha 'tests/integration/**/*.test.js' --timeout 40000 --exit --reporter mochawesome --reporter-options reportDir=reports/mochawesome,reportFilename=integration_report,json=true",
+        "test:report:merge": "mochawesome-merge reports/mochawesome/*.json > reports/mochawesome/merged.json",
+        "test:report:html": "marge reports/mochawesome/merged.json -f full_integration_report -o reports/mochawesome",
+        "test:integration:full": "npm run test:integration && timeout /t 2 > NUL && npm run test:report:merge && npm run test:report:html",
         "dev": "nodemon src/server.js",
         "start": "node src/server.js"
     },
@@ -13,12 +20,31 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
-        "@prisma/client": "^6.17.1",
+        "@vercel/blob": "^2.0.0",
+        "bcrypt": "^6.0.0",
+        "chalk": "^5.6.2",
         "dotenv": "^17.2.3",
-        "express": "^5.1.0"
+        "express": "^5.1.0",
+        "express-rate-limit": "^8.1.0",
+        "express-validator": "^7.2.1",
+        "joi": "^18.0.1",
+        "jsonwebtoken": "^9.0.2",
+        "multer": "^2.0.2",
+        "slugify": "^1.6.6"
     },
     "devDependencies": {
+        "@prisma/client": "^5.14.0",
+        "chai": "^6.2.0",
+        "cross-env": "^10.1.0",
+        "mocha": "^11.7.4",
+        "mochawesome": "^7.1.4",
+        "mochawesome-merge": "^5.0.0",
+        "mochawesome-report-generator": "^6.3.0",
         "nodemon": "^3.1.10",
-        "prisma": "^6.17.0"
+        "prisma": "^5.14.0",
+        "supertest": "^7.1.4"
+    },
+    "prisma": {
+        "seed": "node prisma/seed.js"
     }
 }
