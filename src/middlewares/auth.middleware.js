@@ -17,17 +17,17 @@ export const authenticateToken = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, JWT_SECRET)
 
-        // ✅ opsional: pastikan refresh token user masih ada di DB
-        const existingSession = await prisma.refreshToken.findFirst({
-            where: { user_id: decoded.userId },
-        })
+        // // ✅ opsional: pastikan refresh token user masih ada di DB
+        // const existingSession = await prisma.refreshToken.findFirst({
+        //     where: { user_id: decoded.userId },
+        // })
 
-        if (!existingSession) {
-            return next({
-                status: 401,
-                message: 'Session expired or user logged out.',
-            })
-        }
+        // if (!existingSession) {
+        //     return next({
+        //         status: 401,
+        //         message: 'Session expired or user logged out.',
+        //     })
+        // }
 
         req.user = decoded
         next()

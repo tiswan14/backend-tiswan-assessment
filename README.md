@@ -317,8 +317,8 @@ Authorization: Bearer <token>
 
 ---
 
+**Example Filter**
 
-**Example Filter** 
 #### **GET /api/tasks?status=IN_PROGRESS&priority=HIGH**
 
 #### **GET /api/tasks?assigned_to_id=user123**
@@ -466,13 +466,27 @@ Authorization: Bearer <token>
 | **404 Not Found**    | Resource not found       | User, Task, Attachment          |
 | **409 Conflict**     | Duplicate entry          | Register (email exists)         |
 
-## 🧪 Running Tests
+# 🧪 Automated Testing Guide
 
-To run automated tests (if available):
+This project includes a complete **automated testing suite** to ensure code stability, API reliability, and database consistency across all environments.
+Two primary test types are available:
+
+- ✅ **Unit Tests** – Validate core logic and utility functions using **Jest**.
+- 🔗 **Integration Tests** – Validate API endpoints, authentication, and database workflows using **Mocha**, **Chai**, **Supertest**, and **Mochawesome**.
+
+---
+
+## ⚙️ How to Run the Tests
+
+Run the following commands from the project root:
 
 ```bash
-npm test
-````
+# 🧩 Run Unit Tests (Jest)
+npm run test:unit
+
+# 🔗 Run Integration Tests with HTML report generation (Mocha)
+npm run test:integration:full
+
 
 ---
 
@@ -505,9 +519,10 @@ This project aligns with the **Backend Developer requirements** outlined by UPT 
 
 ## 👨‍💻 Author
 
-**Tiswan**  
+**Tiswan**
 Backend Developer Candidate — UPT TIK UNPER × PT Novatec Solution 2025
 
 ```
 
 ```
+````

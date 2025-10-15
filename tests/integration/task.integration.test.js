@@ -1,4 +1,5 @@
 import request from 'supertest'
+import { expect } from 'chai'
 import app from '../../src/app.js'
 import { prisma } from '../../src/config/prisma.js'
 
@@ -6,12 +7,13 @@ let adminToken
 let userToken
 let createdTask
 
-describe('🧩 Task Integration Tests', () => {
-    beforeAll(async () => {
-        jest.setTimeout(40000)
+describe('🧩 Task Integration Tests (Mocha + Chai)', function () {
+    this.timeout(40000)
+
+    before(async () => {
         console.log('🧹 Cleaning database...')
 
-        // Hapus dalam urutan aman (biar gak FK error)
+        // Hapus data lama secara aman (hindari FK error)
         await prisma.attachment.deleteMany()
         await prisma.task.deleteMany()
         await prisma.refreshToken.deleteMany()
@@ -70,14 +72,14 @@ describe('🧩 Task Integration Tests', () => {
         }
 
         console.log('✅ Setup complete!')
-    }, 40000)
+    })
 
-    afterAll(async () => {
+    after(async () => {
         await prisma.$disconnect()
     })
 
     // ✅ CREATE TASK
-    test('✅ POST /api/tasks - should create a new task (ADMIN only)', async () => {
+    it('✅ POST /api/tasks - should create a new task (ADMIN only)', async () => {
         const res = await request(app)
             .post('/api/tasks')
             .set('Authorization', `Bearer ${adminToken}`)
@@ -90,45 +92,49 @@ describe('🧩 Task Integration Tests', () => {
 
         console.log('🧩 CREATE TASK RESPONSE:', res.body)
 
-        expect(res.statusCode).toBe(201)
-        expect(res.body).toHaveProperty('success', true)
-        expect(res.body).toHaveProperty('message', 'Task created successfully')
+        expect(res.statusCode).to.equal(201)
+        expect(res.body).to.have.property('success', true)
+        expect(res.body).to.have.property(
+            'message',
+            'Task created successfully'
+        )
+
         // ✅ fix nested data (karena ada 3 level)
-        expect(res.body.data.data).toHaveProperty(
+        expect(res.body.data.data).to.have.property(
             'title',
             'Integration Test Task'
         )
 
         createdTask = res.body.data.data
-    }, 20000)
+    })
 
     // 📋 GET ALL TASKS
-    test('📋 GET /api/tasks - should return all tasks', async () => {
+    it('📋 GET /api/tasks - should return all tasks', async () => {
         const res = await request(app)
             .get('/api/tasks')
             .set('Authorization', `Bearer ${adminToken}`)
 
-        expect(res.statusCode).toBe(200)
-        expect(res.body).toHaveProperty('success', true)
-        expect(Array.isArray(res.body.data)).toBe(true)
-        expect(res.body.data.length).toBeGreaterThan(0)
+        expect(res.statusCode).to.equal(200)
+        expect(res.body).to.have.property('success', true)
+        expect(res.body.data).to.be.an('array')
+        expect(res.body.data.length).to.be.greaterThan(0)
     })
 
     // 🔍 GET TASK BY ID
-    test('🔍 GET /api/tasks/:id - should return task by ID', async () => {
+    it('🔍 GET /api/tasks/:id - should return task by ID', async () => {
         if (!createdTask) throw new Error('❌ createdTask not set')
 
         const res = await request(app)
             .get(`/api/tasks/${createdTask.id}`)
             .set('Authorization', `Bearer ${adminToken}`)
 
-        expect(res.statusCode).toBe(200)
-        expect(res.body).toHaveProperty('success', true)
-        expect(res.body.data).toHaveProperty('id', createdTask.id)
+        expect(res.statusCode).to.equal(200)
+        expect(res.body).to.have.property('success', true)
+        expect(res.body.data).to.have.property('id', createdTask.id)
     })
 
     // ✏️ UPDATE TASK (ADMIN)
-    test('✏️ PATCH /api/tasks/:id - should update task (ADMIN)', async () => {
+    it('✏️ PATCH /api/tasks/:id - should update task (ADMIN)', async () => {
         if (!createdTask) throw new Error('❌ createdTask not set')
 
         const res = await request(app)
@@ -139,36 +145,39 @@ describe('🧩 Task Integration Tests', () => {
                 priority: 'LOW',
             })
 
-        expect(res.statusCode).toBe(200)
-        expect(res.body).toHaveProperty('success', true)
-        expect(res.body.data).toHaveProperty(
+        expect(res.statusCode).to.equal(200)
+        expect(res.body).to.have.property('success', true)
+        expect(res.body.data).to.have.property(
             'title',
             'Updated Integration Task'
         )
     })
 
     // 🚫 DELETE TASK (USER forbidden)
-    test('🚫 DELETE /api/tasks/:id - should forbid deletion by USER', async () => {
+    it('🚫 DELETE /api/tasks/:id - should forbid deletion by USER', async () => {
         if (!createdTask) throw new Error('❌ createdTask not set')
 
         const res = await request(app)
             .delete(`/api/tasks/${createdTask.id}`)
             .set('Authorization', `Bearer ${userToken}`)
 
-        expect(res.statusCode).toBe(403)
-        expect(res.body.message).toMatch(/Access denied/i)
+        expect(res.statusCode).to.equal(403)
+        expect(res.body.message).to.match(/Access denied/i)
     })
 
     // 🗑️ DELETE TASK (ADMIN success)
-    test('🗑️ DELETE /api/tasks/:id - should delete task successfully (ADMIN)', async () => {
+    it('🗑️ DELETE /api/tasks/:id - should delete task successfully (ADMIN)', async () => {
         if (!createdTask) throw new Error('❌ createdTask not set')
 
         const res = await request(app)
             .delete(`/api/tasks/${createdTask.id}`)
             .set('Authorization', `Bearer ${adminToken}`)
 
-        expect(res.statusCode).toBe(200)
-        expect(res.body).toHaveProperty('success', true)
-        expect(res.body).toHaveProperty('message', 'Task deleted successfully')
+        expect(res.statusCode).to.equal(200)
+        expect(res.body).to.have.property('success', true)
+        expect(res.body).to.have.property(
+            'message',
+            'Task deleted successfully'
+        )
     })
 })
