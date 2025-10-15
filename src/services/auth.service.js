@@ -5,9 +5,11 @@ import {
     createRefreshToken,
     deleteRefreshTokensByUserId,
 } from '../repositories/refreshToken.repository.js'
+import jwt from 'jsonwebtoken'
+import { prisma } from '../config/prisma.js'
 
 export const authService = {
-    // Fungsi registerUser
+    // ---------------- Register ----------------
     registerUser: async ({ name, email, password, role }) => {
         const existingUser = await findUserByEmail(email)
         if (existingUser) {
@@ -26,19 +28,13 @@ export const authService = {
         return newUser
     },
 
-    //Fungsi Login User
+    // ---------------- Login ----------------
     loginUser: async ({ email, password }) => {
         const user = await findUserByEmail(email)
-
-        if (!user) {
-            throw new Error('Invalid email or password.')
-        }
+        if (!user) throw new Error('Invalid email or password.')
 
         const isPasswordValid = await comparePassword(password, user.password)
-
-        if (!isPasswordValid) {
-            throw new Error('Invalid email or password.')
-        }
+        if (!isPasswordValid) throw new Error('Invalid email or password.')
 
         const accessToken = generateAccessToken({
             userId: user.id,
@@ -46,39 +42,36 @@ export const authService = {
         })
 
         const refreshToken = generateRefreshToken()
-
         const expiresAt = new Date()
         expiresAt.setDate(expiresAt.getDate() + 7)
 
         await createRefreshToken(user.id, refreshToken, expiresAt)
-
         return { accessToken, refreshToken }
     },
 
+    // ---------------- Logout ----------------
     logoutUser: async (userId) => {
         await deleteRefreshTokensByUserId(userId)
         return { message: 'Logout successful' }
     },
-    refreshToken: async (token) => {
-        const jwt = await import('jsonwebtoken')
-        const { prisma } = await import('../config/prisma.js')
 
+    // ---------------- Refresh Token ----------------
+    refreshToken: async (token) => {
         if (!token) throw new Error('Refresh token is required')
 
         const storedToken = await prisma.refreshToken.findFirst({
             where: { token },
             include: { user: true },
         })
-        if (!storedToken) throw new Error('Invalid refresh token')
 
-        if (storedToken.expires_at < new Date()) {
+        if (!storedToken) throw new Error('Invalid refresh token')
+        if (storedToken.expires_at < new Date())
             throw new Error('Refresh token expired')
-        }
 
         const user = storedToken.user
         if (!user) throw new Error('User not found')
 
-        const newAccessToken = jwt.default.sign(
+        const newAccessToken = jwt.sign(
             {
                 userId: user.id,
                 email: user.email,

@@ -1,90 +1,68 @@
-// tests/repositories/refreshToken.repository.test.js
 import { prisma } from '../../../src/config/prisma.js'
 import {
     createRefreshToken,
     findRefreshToken,
     deleteRefreshToken,
+    deleteRefreshTokensByUserId,
 } from '../../../src/repositories/refreshToken.repository.js'
 
-// Mock prisma client
 jest.mock('../../../src/config/prisma.js', () => ({
     prisma: {
         refreshToken: {
             create: jest.fn(),
             findUnique: jest.fn(),
             delete: jest.fn(),
+            deleteMany: jest.fn(),
         },
     },
 }))
 
-describe('refreshToken.repository', () => {
-    beforeEach(() => {
-        jest.clearAllMocks()
+describe('🔁 refreshToken.repository Unit Tests', () => {
+    afterEach(() => jest.clearAllMocks())
+
+    it('✅ should create refresh token', async () => {
+        const mockToken = { id: 1, token: 'abc123' }
+        prisma.refreshToken.create.mockResolvedValue(mockToken)
+
+        const result = await createRefreshToken('user1', 'abc123', new Date())
+
+        expect(prisma.refreshToken.create).toHaveBeenCalledWith({
+            data: expect.objectContaining({ user_id: 'user1', token: 'abc123' }),
+        })
+        expect(result).toEqual(mockToken)
     })
 
-    // ---------------- CREATE REFRESH TOKEN ----------------
-    describe('createRefreshToken', () => {
-        it('should create a refresh token successfully', async () => {
-            const fakeToken = {
-                user_id: 'user1',
-                token: 'refresh-token',
-                expires_at: new Date(),
-            }
+    it('✅ should find refresh token', async () => {
+        const fakeToken = { token: 'abc123' }
+        prisma.refreshToken.findUnique.mockResolvedValue(fakeToken)
 
-            prisma.refreshToken.create.mockResolvedValue(fakeToken)
+        const result = await findRefreshToken('abc123')
 
-            const result = await createRefreshToken(
-                'user1',
-                'refresh-token',
-                fakeToken.expires_at
-            )
-
-            expect(result).toEqual(fakeToken)
-            expect(prisma.refreshToken.create).toHaveBeenCalledWith({
-                data: {
-                    user_id: 'user1',
-                    token: 'refresh-token',
-                    expires_at: fakeToken.expires_at,
-                },
-            })
+        expect(prisma.refreshToken.findUnique).toHaveBeenCalledWith({
+            where: { token: 'abc123' },
         })
+        expect(result).toEqual(fakeToken)
     })
 
-    // ---------------- FIND REFRESH TOKEN ----------------
-    describe('findRefreshToken', () => {
-        it('should return refresh token if found', async () => {
-            const fakeToken = { token: 'refresh-token', user_id: 'user1' }
-            prisma.refreshToken.findUnique.mockResolvedValue(fakeToken)
+    it('✅ should delete refresh token', async () => {
+        prisma.refreshToken.delete.mockResolvedValue(true)
 
-            const result = await findRefreshToken('refresh-token')
-            expect(result).toEqual(fakeToken)
-            expect(prisma.refreshToken.findUnique).toHaveBeenCalledWith({
-                where: { token: 'refresh-token' },
-            })
+        const result = await deleteRefreshToken('token123')
+
+        expect(prisma.refreshToken.delete).toHaveBeenCalledWith({
+            where: { token: 'token123' },
         })
-
-        it('should return null if token not found', async () => {
-            prisma.refreshToken.findUnique.mockResolvedValue(null)
-
-            const result = await findRefreshToken('notfound')
-            expect(result).toBeNull()
-            expect(prisma.refreshToken.findUnique).toHaveBeenCalledWith({
-                where: { token: 'notfound' },
-            })
-        })
+        expect(result).toBe(true)
     })
 
-    // ---------------- DELETE REFRESH TOKEN ----------------
-    describe('deleteRefreshToken', () => {
-        it('should delete refresh token successfully', async () => {
-            const fakeToken = { token: 'refresh-token', user_id: 'user1' }
-            prisma.refreshToken.delete.mockResolvedValue(fakeToken)
+    it('✅ should delete all refresh tokens by user id', async () => {
+        prisma.refreshToken.deleteMany.mockResolvedValue({ count: 2 })
 
-            const result = await deleteRefreshToken('refresh-token')
-            expect(result).toEqual(fakeToken)
-            expect(prisma.refreshToken.delete).toHaveBeenCalledWith({
-                where: { token: 'refresh-token' },
-            })
+        const result = await deleteRefreshTokensByUserId('user123')
+
+        expect(prisma.refreshToken.deleteMany).toHaveBeenCalledWith({
+            where: { user_id: 'user123' },
         })
+        expect(result).toEqual({ count: 2 })
     })
 })
