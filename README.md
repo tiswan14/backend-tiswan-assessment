@@ -70,10 +70,15 @@ cp .env.example .env
 Then fill in your actual credentials:
 
 ```bash
-DATABASE_URL="postgresql://<username>:<password>@<host>:<port>/<database>?sslmode=require"
-JWT_SECRET="<your-jwt-secret>"
-BLOB_READ_WRITE_TOKEN="<your-vercel-blob-token>"
+DATABASE_URL=postgresql://neondb_owner:npg_w1IGbhNUn0Dj@ep-odd-dream-a184jw18-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
 PORT=3000
+JWT_SECRET=super-secret-key
+
+JWT_ACCESS_SECRET=your-super-secure-access-secret-key-min-32-chars
+JWT_REFRESH_SECRET=your-super-secure-refresh-secret-key-min-32-chars
+
+BLOB_READ_WRITE_TOKEN="vercel_blob_rw_UWarq7s7Nghws30T_aynbkYbKgHMj0xzGtQc6FTSPbcrHEG"
+
 NODE_ENV=development
 ```
 
@@ -466,29 +471,48 @@ Authorization: Bearer <token>
 | **404 Not Found**    | Resource not found       | User, Task, Attachment          |
 | **409 Conflict**     | Duplicate entry          | Register (email exists)         |
 
-# 🧪 Automated Testing Guide
 
-This project includes a complete **automated testing suite** to ensure code stability, API reliability, and database consistency across all environments.
-Two primary test types are available:
 
-- ✅ **Unit Tests** – Validate core logic and utility functions using **Jest**.
-- 🔗 **Integration Tests** – Validate API endpoints, authentication, and database workflows using **Mocha**, **Chai**, **Supertest**, and **Mochawesome**.
+## 🧪 Test Reports Overview
+
+This directory contains the **automated test reports** generated from both the unit tests and integration tests of this project.
+These reports provide detailed insights into test coverage, performance, and stability across the application.
 
 ---
 
-## ⚙️ How to Run the Tests
+## 📁 Directory
 
-Run the following commands from the project root:
+- **Integration Test Report:** [`docs/integration-test-report/index.html`](docs/integration-test-report/index.html)
+- **Unit Test Report:** [`docs/unit-test-report/index.html`](docs/unit-test-report/index.html)
+
+---
+
+## 🧪 Automated Testing & Reporting Guide
+
+This project includes a **complete testing environment** to ensure code quality, maintainability, and production reliability.
+It uses both **Unit Tests** and **Integration Tests**, with automated reporting in the form of **HTML, JSON, and coverage reports**.
+
+---
+
+## 📘 Overview
+
+| Type | Frameworks Used | Purpose |
+|------|------------------|----------|
+| **Unit Tests** | Jest | Validate individual modules, functions, and business logic. |
+| **Integration Tests** | Mocha + Chai + Supertest + Mochawesome | Validate the interaction between API endpoints, middleware, and database layers. |
+
+---
+
+## ⚙️ How to Run Tests
+
+Run these commands from the project root:
 
 ```bash
 # 🧩 Run Unit Tests (Jest)
 npm run test:unit
 
-# 🔗 Run Integration Tests with HTML report generation (Mocha)
+# 🔗 Run Integration Tests (Mocha + Chai + Supertest)
 npm run test:integration:full
-
-
----
 
 ## 🧩 Optional Additions
 
