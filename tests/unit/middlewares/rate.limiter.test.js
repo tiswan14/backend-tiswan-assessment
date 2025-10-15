@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import rateLimit from 'express-rate-limit'
 
 // 🧠 Mock dulu fungsi `express-rate-limit`

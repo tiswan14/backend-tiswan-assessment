@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { prisma } from '../config/prisma.js'
 
-const JWT_SECRET = process.env.JWT_ACCESS_SECRET // ✅ gunakan secret yang sama dengan saat sign
+const JWT_SECRET = process.env.JWT_ACCESS_SECRET
 
 export const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization']
@@ -17,7 +17,6 @@ export const authenticateToken = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, JWT_SECRET)
 
-        // ✅ opsional: pastikan refresh token user masih ada di DB
         const existingSession = await prisma.refreshToken.findFirst({
             where: { user_id: decoded.userId },
         })
@@ -37,7 +36,7 @@ export const authenticateToken = async (req, res, next) => {
             error.name === 'JsonWebTokenError'
         ) {
             return next({
-                status: 403,
+                status: 401,
                 message: 'Invalid or expired token.',
             })
         }

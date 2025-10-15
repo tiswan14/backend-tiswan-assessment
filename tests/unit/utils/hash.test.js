@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 // tests/utils/hash.test.js
 import * as hashUtils from '../../../src/utils/hash.js'
 import bcrypt from 'bcrypt'

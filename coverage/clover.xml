@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1760510359534" clover="3.2.0">
-  <project timestamp="1760510359534" name="All files">
+<coverage generated="1760531511587" clover="3.2.0">
+  <project timestamp="1760531511587" name="All files">
     <metrics statements="349" coveredstatements="330" conditionals="192" coveredconditionals="158" methods="61" coveredmethods="61" elements="602" coveredelements="549" complexity="0" loc="349" ncloc="349" packages="7" files="22" classes="22"/>
     <package name="controllers">
       <metrics statements="126" coveredstatements="118" conditionals="38" coveredconditionals="30" methods="15" coveredmethods="15"/>
@@ -170,14 +170,14 @@
         <line num="11" count="1" type="stmt"/>
         <line num="17" count="5" type="stmt"/>
         <line num="18" count="5" type="stmt"/>
-        <line num="21" count="2" type="stmt"/>
-        <line num="25" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="26" count="1" type="stmt"/>
+        <line num="20" count="2" type="stmt"/>
+        <line num="24" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="31" count="1" type="stmt"/>
         <line num="32" count="1" type="stmt"/>
-        <line num="33" count="1" type="stmt"/>
-        <line num="35" count="3" type="cond" truecount="2" falsecount="0"/>
-        <line num="39" count="2" type="stmt"/>
-        <line num="44" count="1" type="stmt"/>
+        <line num="34" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="38" count="2" type="stmt"/>
+        <line num="43" count="1" type="stmt"/>
       </file>
       <file name="error.handler.js" path="D:\Codingan\JavaScript\ExpressJS\backend-task-api\src\middlewares\error.handler.js">
         <metrics statements="5" coveredstatements="5" conditionals="9" coveredconditionals="8" methods="1" coveredmethods="1"/>

@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { errorHandler } from '../../../src/middlewares/error.handler.js'
 
 describe('💥 errorHandler Middleware Unit Tests', () => {

@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import jwt from 'jsonwebtoken'
 import { prisma } from '../../../src/config/prisma.js'
 import { authenticateToken } from '../../../src/middlewares/auth.middleware.js'
@@ -39,7 +40,7 @@ describe('🔐 authenticateToken Middleware Unit Tests', () => {
     })
 
     // ---------------- INVALID TOKEN ----------------
-    it('🚫 should call next with 403 if token invalid', async () => {
+    it('🚫 should call next with 401 if token invalid', async () => {
         req.headers['authorization'] = 'Bearer invalidToken'
         const jwtError = new Error('invalid signature')
         jwtError.name = 'JsonWebTokenError'
@@ -50,7 +51,7 @@ describe('🔐 authenticateToken Middleware Unit Tests', () => {
         await authenticateToken(req, res, next)
 
         expect(next).toHaveBeenCalledWith({
-            status: 403,
+            status: 401,
             message: 'Invalid or expired token.',
         })
     })
@@ -67,7 +68,7 @@ describe('🔐 authenticateToken Middleware Unit Tests', () => {
         await authenticateToken(req, res, next)
 
         expect(next).toHaveBeenCalledWith({
-            status: 403,
+            status: 401,
             message: 'Invalid or expired token.',
         })
     })

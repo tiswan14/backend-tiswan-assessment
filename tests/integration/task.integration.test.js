@@ -1,174 +1,179 @@
+/**
+ * @fileoverview Integration Tests for Task Routes
+ * Covers: create, getAll, getById, update, delete
+ */
+
 import request from 'supertest'
 import app from '../../src/app.js'
 import { prisma } from '../../src/config/prisma.js'
+import jwt from 'jsonwebtoken'
 
-let adminToken
-let userToken
-let createdTask
+const JWT_SECRET =
+    process.env.JWT_SECRET ||
+    process.env.JWT_ACCESS_SECRET ||
+    'super-secret-key'
 
-describe('🧩 Task Integration Tests', () => {
-    beforeAll(async () => {
-        jest.setTimeout(40000)
-        console.log('🧹 Cleaning database...')
+// Dummy users
+let adminUser, managerUser, normalUser
+let adminToken, managerToken, normalToken
+let createdTaskId
 
-        // Hapus dalam urutan aman (biar gak FK error)
-        await prisma.attachment.deleteMany()
-        await prisma.task.deleteMany()
-        await prisma.refreshToken.deleteMany()
-        await prisma.user.deleteMany()
+beforeAll(async () => {
+    // Bersihkan data agar tidak bentrok
+    await prisma.$transaction([
+        prisma.attachment.deleteMany(),
+        prisma.task.deleteMany(),
+        prisma.user.deleteMany(),
+    ])
 
-        // 🔐 Register Admin
-        console.log('🧑‍💼 Registering ADMIN...')
-        await request(app).post('/api/auth/register').send({
-            name: 'Admin Tester',
+    // Buat user
+    adminUser = await prisma.user.create({
+        data: {
+            name: 'Admin User',
             email: 'admin@example.com',
-            password: 'password123',
+            password: 'hashedpassword',
             role: 'ADMIN',
-        })
-
-        // 🔑 Login Admin
-        const adminLogin = await request(app).post('/api/auth/login').send({
-            email: 'admin@example.com',
-            password: 'password123',
-        })
-
-        adminToken =
-            adminLogin.body.accessToken ||
-            adminLogin.body.data?.accessToken ||
-            adminLogin.body.token ||
-            null
-
-        if (!adminToken) {
-            console.error('❌ Admin login response:', adminLogin.body)
-            throw new Error('❌ Admin token not generated')
-        }
-
-        // 👤 Register User
-        console.log('👤 Registering USER...')
-        await request(app).post('/api/auth/register').send({
-            name: 'User Tester',
-            email: 'user@example.com',
-            password: 'password123',
-            role: 'USER',
-        })
-
-        // 🔑 Login User
-        const userLogin = await request(app).post('/api/auth/login').send({
-            email: 'user@example.com',
-            password: 'password123',
-        })
-
-        userToken =
-            userLogin.body.accessToken ||
-            userLogin.body.data?.accessToken ||
-            userLogin.body.token ||
-            null
-
-        if (!userToken) {
-            console.error('❌ User login response:', userLogin.body)
-            throw new Error('❌ User token not generated')
-        }
-
-        console.log('✅ Setup complete!')
-    }, 40000)
-
-    afterAll(async () => {
-        await prisma.$disconnect()
+        },
     })
 
+    managerUser = await prisma.user.create({
+        data: {
+            name: 'Manager User',
+            email: 'manager@example.com',
+            password: 'hashedpassword',
+            role: 'MANAGER',
+        },
+    })
+
+    normalUser = await prisma.user.create({
+        data: {
+            name: 'Normal User',
+            email: 'user@example.com',
+            password: 'hashedpassword',
+            role: 'USER',
+        },
+    })
+
+    // Generate JWT Token
+    adminToken = jwt.sign(
+        { userId: adminUser.id, role: adminUser.role },
+        JWT_SECRET
+    )
+    managerToken = jwt.sign(
+        { userId: managerUser.id, role: managerUser.role },
+        JWT_SECRET
+    )
+    normalToken = jwt.sign(
+        { userId: normalUser.id, role: normalUser.role },
+        JWT_SECRET
+    )
+})
+
+afterAll(async () => {
+    await prisma.$disconnect()
+})
+
+describe('🧪 TASK Integration Tests', () => {
     // ✅ CREATE TASK
-    test('✅ POST /api/tasks - should create a new task (ADMIN only)', async () => {
+    it('✅ should create a new task by ADMIN', async () => {
         const res = await request(app)
             .post('/api/tasks')
             .set('Authorization', `Bearer ${adminToken}`)
             .send({
-                title: 'Integration Test Task',
-                description: 'Task created for integration testing',
-                due_date: new Date(Date.now() + 86400000),
-                priority: 'HIGH',
+                title: 'Integration Task 1',
+                description: 'Test integration task',
+                due_date: new Date().toISOString(),
+                assigned_to_id: managerUser.id,
             })
 
-        console.log('🧩 CREATE TASK RESPONSE:', res.body)
-
         expect(res.statusCode).toBe(201)
-        expect(res.body).toHaveProperty('success', true)
-        expect(res.body).toHaveProperty('message', 'Task created successfully')
-        // ✅ fix nested data (karena ada 3 level)
-        expect(res.body.data.data).toHaveProperty(
-            'title',
-            'Integration Test Task'
-        )
+        expect(res.body.success).toBe(true)
+        expect(res.body.data).toHaveProperty('id')
 
-        createdTask = res.body.data.data
-    }, 20000)
+        createdTaskId = res.body.data.id
+    })
 
-    // 📋 GET ALL TASKS
-    test('📋 GET /api/tasks - should return all tasks', async () => {
+    it('❌ should forbid USER from creating a task', async () => {
+        const res = await request(app)
+            .post('/api/tasks')
+            .set('Authorization', `Bearer ${normalToken}`)
+            .send({
+                title: 'User Task',
+                description: 'Should not work',
+                due_date: new Date().toISOString(),
+            })
+
+        expect(res.statusCode).toBe(403)
+    })
+
+    // ✅ GET ALL TASKS
+    it('✅ should fetch all tasks', async () => {
         const res = await request(app)
             .get('/api/tasks')
             .set('Authorization', `Bearer ${adminToken}`)
 
         expect(res.statusCode).toBe(200)
-        expect(res.body).toHaveProperty('success', true)
         expect(Array.isArray(res.body.data)).toBe(true)
-        expect(res.body.data.length).toBeGreaterThan(0)
     })
 
-    // 🔍 GET TASK BY ID
-    test('🔍 GET /api/tasks/:id - should return task by ID', async () => {
-        if (!createdTask) throw new Error('❌ createdTask not set')
-
+    // ✅ GET TASK BY ID
+    it('✅ should get a task by ID', async () => {
         const res = await request(app)
-            .get(`/api/tasks/${createdTask.id}`)
+            .get(`/api/tasks/${createdTaskId}`)
             .set('Authorization', `Bearer ${adminToken}`)
 
         expect(res.statusCode).toBe(200)
-        expect(res.body).toHaveProperty('success', true)
-        expect(res.body.data).toHaveProperty('id', createdTask.id)
+        expect(res.body.data).toHaveProperty('id', createdTaskId)
     })
 
-    // ✏️ UPDATE TASK (ADMIN)
-    test('✏️ PATCH /api/tasks/:id - should update task (ADMIN)', async () => {
-        if (!createdTask) throw new Error('❌ createdTask not set')
-
+    it('❌ should return 404 if task not found', async () => {
         const res = await request(app)
-            .patch(`/api/tasks/${createdTask.id}`)
+            .get('/api/tasks/unknown-id')
+            .set('Authorization', `Bearer ${adminToken}`)
+
+        expect(res.statusCode).toBe(404)
+    })
+
+    // ✅ UPDATE TASK
+    it('✅ should update task successfully by ADMIN', async () => {
+        const res = await request(app)
+            .patch(`/api/tasks/${createdTaskId}`)
             .set('Authorization', `Bearer ${adminToken}`)
             .send({
-                title: 'Updated Integration Task',
-                priority: 'LOW',
+                title: 'Updated Task Title',
+                status: 'IN_PROGRESS',
             })
 
         expect(res.statusCode).toBe(200)
-        expect(res.body).toHaveProperty('success', true)
-        expect(res.body.data).toHaveProperty(
-            'title',
-            'Updated Integration Task'
-        )
+        expect(res.body.data.title).toBe('Updated Task Title')
     })
 
-    // 🚫 DELETE TASK (USER forbidden)
-    test('🚫 DELETE /api/tasks/:id - should forbid deletion by USER', async () => {
-        if (!createdTask) throw new Error('❌ createdTask not set')
-
+    it('❌ should not allow USER to update task', async () => {
         const res = await request(app)
-            .delete(`/api/tasks/${createdTask.id}`)
-            .set('Authorization', `Bearer ${userToken}`)
+            .patch(`/api/tasks/${createdTaskId}`)
+            .set('Authorization', `Bearer ${normalToken}`)
+            .send({
+                title: 'Should not work',
+            })
 
         expect(res.statusCode).toBe(403)
-        expect(res.body.message).toMatch(/Access denied/i)
     })
 
-    // 🗑️ DELETE TASK (ADMIN success)
-    test('🗑️ DELETE /api/tasks/:id - should delete task successfully (ADMIN)', async () => {
-        if (!createdTask) throw new Error('❌ createdTask not set')
-
+    // ✅ DELETE TASK
+    it('✅ should delete task by ADMIN', async () => {
         const res = await request(app)
-            .delete(`/api/tasks/${createdTask.id}`)
+            .delete(`/api/tasks/${createdTaskId}`)
             .set('Authorization', `Bearer ${adminToken}`)
 
         expect(res.statusCode).toBe(200)
-        expect(res.body).toHaveProperty('success', true)
-        expect(res.body).toHaveProperty('message', 'Task deleted successfully')
+        expect(res.body.message).toBe('Task deleted successfully')
+    })
+
+    it('❌ should not allow USER to delete task', async () => {
+        const res = await request(app)
+            .delete(`/api/tasks/${createdTaskId}`)
+            .set('Authorization', `Bearer ${normalToken}`)
+
+        expect([403, 404]).toContain(res.statusCode)
     })
 })

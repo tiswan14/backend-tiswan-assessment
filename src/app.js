@@ -6,7 +6,12 @@ import taskRoutes from './routes/task.route.js'
 import attachmentRoutes from './routes/attachment.route.js'
 import { errorHandler } from './middlewares/error.handler.js'
 
-dotenv.config()
+if (process.env.NODE_ENV === 'test') {
+    console.log('🧪 Using .env.test for testing environment')
+    dotenv.config({ path: '.env.test', override: true })
+} else {
+    dotenv.config()
+}
 
 const app = express()
 

@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import multer from 'multer'
 import { upload } from '../../../src/middlewares/upload.middleware.js'
 

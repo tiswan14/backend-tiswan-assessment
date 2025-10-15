@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import {
     uploadTaskAttachment,
     handleDeleteAttachment,
@@ -12,7 +13,7 @@ import {
 jest.mock('../../../src/services/attachment.service.js', () => ({
     uploadFile: jest.fn(),
     deleteAttachmentService: jest.fn(),
-}))
+}));
 
 describe('📎 Attachment Controller Unit Tests', () => {
     let req, res, next

@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 import { authorizeRoles } from '../../../src/middlewares/rbac.middleware.js'
 
 describe('🛡️ authorizeRoles Middleware Unit Tests', () => {

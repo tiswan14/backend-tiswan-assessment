@@ -462,15 +462,24 @@ Authorization: Bearer <token>
 | **404 Not Found**    | Resource not found       | User, Task, Attachment          |
 | **409 Conflict**     | Duplicate entry          | Register (email exists)         |
 
-## 🧪 Running Tests
 
-To run automated tests (if available):
+## 🧪 Unit Test Report
 
-```bash
-npm test
-````
+This folder contains the generated **unit test coverage report** produced by Jest and Istanbul.
+It is used to review test coverage results and maintain project code quality.
+
+📍 Location: `/docs/unit-test-report/index.html`
+
 
 ---
+
+## 🔗 Integration Test Report
+
+This folder contains the generated **integration test coverage report**.
+It helps ensure that multiple modules or services work correctly together during end-to-end testing.
+
+📍 Location: `/docs/integration-test-report/index.html`
+
 
 ## 🧩 Optional Additions
 
@@ -504,6 +513,7 @@ This project aligns with the **Backend Developer requirements** outlined by UPT 
 
 ## 👨‍💻 Author
 
-**Tiswan**  
+**Tiswan**
 Backend Developer Candidate — UPT TIK UNPER × PT Novatec Solution 2025
 ```
+````

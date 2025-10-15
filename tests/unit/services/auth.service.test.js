@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { authService } from '../../../src/services/auth.service.js'
 import * as authRepo from '../../../src/repositories/auth.repository.js'
 import * as hashUtils from '../../../src/utils/hash.js'

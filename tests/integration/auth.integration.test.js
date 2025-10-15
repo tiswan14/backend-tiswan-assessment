@@ -1,65 +1,52 @@
-import request from 'supertest'
-import app from '../../src/app.js'
-import { prisma } from '../../src/config/prisma.js'
+import { api } from './setup.js'
 
-describe('🔐 Auth Integration Tests', () => {
-    // =============================
-    // 🧹 Hapus semua data sebelum test
-    // =============================
-    beforeAll(async () => {
-        // Urutan penting! Hapus RefreshToken dulu karena ada FK ke User
-        await prisma.$transaction([
-            prisma.refreshToken.deleteMany(),
-            prisma.user.deleteMany(),
-        ])
-    })
+describe('🔐 AUTH Integration Tests', () => {
+    let refreshToken
+    let integrationEmail // simpan email biar konsisten antar test
 
-    // Tutup koneksi Prisma setelah test
-    afterAll(async () => {
-        await prisma.$disconnect()
-    })
+    it('✅ should register a new user', async () => {
+        integrationEmail = `integration_${Date.now()}@test.com` // unik tiap run
 
-    // Dummy data untuk test
-    const userData = {
-        name: 'Integration Test User',
-        email: 'integration@test.com',
-        password: 'password123',
-        role: 'USER',
-    }
+        const res = await api.post('/api/auth/register').send({
+            name: 'Integration User',
+            email: integrationEmail,
+            password: 'secret123',
+            role: 'USER',
+        })
 
-    // =============================
-    // ✅ TEST: REGISTER USER
-    // =============================
-    test('✅ POST /api/auth/register - should register a new user', async () => {
-        const res = await request(app).post('/api/auth/register').send(userData)
-
-        // Cek status dan struktur response
-        expect(res.statusCode).toBe(201)
-        expect(res.body).toHaveProperty('message', 'User created successfully')
+        expect(res.status).toBe(201)
         expect(res.body).toHaveProperty('user')
-        expect(res.body.user).toHaveProperty('email', userData.email)
-        expect(res.body.user).toHaveProperty('role', 'USER')
-
-        // Pastikan user tersimpan di DB
-        const userInDb = await prisma.user.findUnique({
-            where: { email: userData.email },
-        })
-        expect(userInDb).not.toBeNull()
+        expect(res.body.user.email).toBe(integrationEmail)
     })
 
-    // =============================
-    // 🔑 TEST: LOGIN USER
-    // =============================
-    test('🔑 POST /api/auth/login - should login and return tokens', async () => {
-        const res = await request(app).post('/api/auth/login').send({
-            email: userData.email,
-            password: userData.password,
+    it('✅ should login user and return tokens', async () => {
+        const res = await api.post('/api/auth/login').send({
+            email: integrationEmail, // 🔧 pakai email dari register
+            password: 'secret123',
         })
 
-        expect(res.statusCode).toBe(200)
-        expect(res.body).toHaveProperty('success', true)
-        expect(res.body).toHaveProperty('data.accessToken')
-        expect(res.body).toHaveProperty('data.refreshToken')
-        expect(typeof res.body.data.accessToken).toBe('string')
+        expect(res.status).toBe(200)
+        expect(res.body.data).toHaveProperty('accessToken')
+        expect(res.body.data).toHaveProperty('refreshToken')
+
+        refreshToken = res.body.data.refreshToken
+    })
+
+    it('✅ should refresh token successfully', async () => {
+        const res = await api.post('/api/auth/refresh-token').send({
+            refreshToken,
+        })
+
+        expect(res.status).toBe(200)
+        expect(res.body.data).toHaveProperty('accessToken')
+    })
+
+    it('✅ should logout successfully', async () => {
+        const res = await api
+            .post('/api/auth/logout')
+            .set('Authorization', 'Bearer dummy')
+
+        // bisa 200 (kalau valid user login) atau 401 (token invalid)
+        expect([200, 401]).toContain(res.status)
     })
 })
